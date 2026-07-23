@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JO FF Clan | الحسابات</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container navbar">
+      <div class="brand">
+        <div class="brand-badge">📦</div>
+        <span>JO FF Clan</span>
+      </div>
+      <nav class="nav-links">
+        <a href="intro.html" data-i18n="nav_intro">المقدمة</a>
+        <a href="clan.html" data-i18n="nav_clan">عن الكلان</a>
+        <a href="competitions.html" data-i18n="nav_competitions">المسابقات</a>
+        <a href="contact.html" data-i18n="nav_contact">التواصل</a>
+        <a class="active" href="accounts.html" data-i18n="nav_market">الحسابات</a>
+        <a href="links.html" data-i18n="nav_links">الروابط</a>
+      </nav>
+      <div class="control-group">
+        <button id="themeToggle" class="btn secondary small" type="button">الوضع الليلي</button>
+        <button id="langToggle" class="btn secondary small" type="button">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <section class="grid-2">
+      <div class="panel">
+        <h2 data-i18n="market_title">بيع وشراء الحسابات داخل اللعبة</h2>
+        <p class="muted" data-i18n="market_desc">يمكنك عرض الحسابات المتاحة للبيع، مع صورة، السعر، مواصفات الحساب، وروابط التواصل مع الكلان والقيادة.</p>
+
+        <div class="leader-links">
+          <a href="#">Instagram: @joff_clan</a>
+          <a href="#">TikTok: @joff_tiktok</a>
+          <a href="#">القائد: @joff_leader</a>
+          <a href="#">بنيابة الزعيم: @joff_v1</a>
+        </div>
+
+        <div id="marketCards" class="market-grid"></div>
+      </div>
+
+      <div class="panel">
+        <h2 data-i18n="market_form">إضافة حساب جديد</h2>
+        <form id="marketForm">
+          <div class="form-grid">
+            <div>
+              <label data-i18n="label_name">اسم الحساب</label>
+              <input id="accountName" class="input" type="text" placeholder="مثل: Account Elite 1" />
+            </div>
+            <div>
+              <label data-i18n="label_type">نوع الحساب</label>
+              <select id="accountType">
+                <option value="نادر">نادر</option>
+                <option value="كلاسيكي">كلاسيكي</option>
+                <option value="احداث">احداث</option>
+                <option value="مختلط">مختلط</option>
+              </select>
+            </div>
+            <div>
+              <label>البرايم</label>
+              <select id="primeType">
+                <option value="برايم 1">برايم 1</option>
+                <option value="برايم 2">برايم 2</option>
+                <option value="برايم 3">برايم 3</option>
+                <option value="برايم 4">برايم 4</option>
+                <option value="برايم 5">برايم 5</option>
+                <option value="برايم 6">برايم 6</option>
+                <option value="برايم 7">برايم 7</option>
+                <option value="برايم 8">برايم 8</option>
+              </select>
+            </div>
+            <div>
+              <label data-i18n="label_price">السعر بالدينار الأردني</label>
+              <input id="accountPrice" class="input" type="number" placeholder="25" />
+            </div>
+            <div>
+              <label data-i18n="label_upload">رفع صورة من الجهاز</label>
+              <input id="accountImageFile" class="input" type="file" accept="image/*" />
+            </div>
+            <div class="full-span">
+              <label data-i18n="label_specs">مواصفات الحساب</label>
+              <textarea id="accountSpecs" rows="4" placeholder="اكتب هنا مواصفات الحساب"></textarea>
+            </div>
+            <div class="full-span">
+              <button class="btn full" type="submit" data-i18n="btn_add">إضافة الحساب</button>
+              <div id="marketStatus" class="status"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

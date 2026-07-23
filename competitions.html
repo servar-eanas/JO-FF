@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JO FF Clan | المسابقات</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container navbar">
+      <div class="brand">
+        <div class="brand-badge">🏆</div>
+        <span>JO FF Clan</span>
+      </div>
+      <nav class="nav-links">
+        <a href="intro.html" data-i18n="nav_intro">المقدمة</a>
+        <a href="clan.html" data-i18n="nav_clan">عن الكلان</a>
+        <a class="active" href="competitions.html" data-i18n="nav_competitions">المسابقات</a>
+        <a href="contact.html" data-i18n="nav_contact">التواصل</a>
+        <a href="accounts.html" data-i18n="nav_market">الحسابات</a>
+        <a href="links.html" data-i18n="nav_links">الروابط</a>
+      </nav>
+      <div class="control-group">
+        <button id="themeToggle" class="btn secondary small" type="button">الوضع الليلي</button>
+        <button id="langToggle" class="btn secondary small" type="button">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container hero">
+    <section class="grid-2">
+      <div class="panel">
+        <div class="section-head">
+          <h2 data-i18n="competitions_title">المسابقات</h2>
+          <span class="badge">Season 2026</span>
+        </div>
+        <div class="list">
+          <div class="list-item">مسابقة Clash Squad أسبوعية مع نظام نقاط واضح</div>
+          <div class="list-item">بطولة Battle Royale شهرية للفرق المتميزة</div>
+          <div class="list-item">مكافآت للأعضاء المبدعين والمنتظمين</div>
+          <div class="list-item">جهود تدريبية ترفع مستوى الفريق قبل المسابقة</div>
+        </div>
+      </div>
+      <div class="panel hero-banner">
+        <img class="game-image" src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80" alt="Competitive gaming banner" />
+      </div>
+    </section>
+
+    <section class="grid-2" style="margin-top: 18px;">
+      <div class="panel">
+        <h3>اختر المسابقة للتفاصيل</h3>
+        <label for="competitionSelect">المسابقة</label>
+        <select id="competitionSelect" class="input">
+          <option value="clash">مسابقة Clash Squad</option>
+          <option value="battle">بطولة Battle Royale</option>
+          <option value="rewards">مكافآت الأعضاء</option>
+        </select>
+        <div id="competitionDetails" class="detail-box"></div>
+      </div>
+      <div class="panel">
+        <h3>نظام المسابقات</h3>
+        <p class="muted">يمكنك من هذا القسم رؤية تفاصيل كل فعالية بشكل سريع عند اختيارها من القائمة، مع توضيح المدة والشكل والجوائز.</p>
+        <div class="list">
+          <div class="list-item">تحضير للفعالية قبل بدأها</div>
+          <div class="list-item">حضور منظم ومسجل داخل الفريق</div>
+          <div class="list-item">عرض النتائج بعد انتهاء المسابقة</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid-2" style="margin-top: 18px;">
+      <div class="panel">
+        <h3>لوحة الأسعار</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>الحساب</th><th>السعر</th><th>الحالة</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>حساب 1 | محروق احداث</td><td>35 د.ا</td><td>مسابقة</td></tr>
+              <tr><td>حساب 2 |  توب كلاش</td><td>25 د.ا</td><td>مسابقة</td></tr>
+              <tr><td>جواهر | 365 </td><td></td><td>مسابقة</td></tr>
+              <tr><td>حساب 3 | سكنات برازيلية </td><td>40 د.ا</td><td>مسابقة</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>تنظيم المسابقات</h3>
+        <p class="muted">نرتب الفعاليات على مراحل واضحة، مع توزيع عادل، ومتابعة الأداء بشكل يضمن تجربة ممتعة وعادلة للجميع.</p>
+        <div class="list">
+          <div class="list-item">تصنيف الفرق</div>
+          <div class="list-item">تحديد المواعيد</div>
+          <div class="list-item">تقييم الأداء</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
