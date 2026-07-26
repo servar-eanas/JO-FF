@@ -4,13 +4,12 @@
 
 const CONTACT_KEY = "clan_contact_messages";
 const MARKET_KEY = "clan_market_accounts";
-const USER_KEY = "user";
 const THEME_KEY = "clan_theme";
 const LANG_KEY = "clan_lang";
 
 
 // ========================================
-// حماية النصوص من أكواد HTML
+// حماية النصوص
 // ========================================
 
 function escapeHtml(text) {
@@ -24,26 +23,26 @@ function escapeHtml(text) {
 
 
 // ========================================
-// الرسائل - عرض الرسائل
+// ================= الرسائل ================
 // ========================================
+
+
+// عرض الرسائل
 
 function renderContactMessages() {
 
   const contactList =
     document.getElementById("contactList");
 
-  // إذا لم تكن صفحة التواصل موجودة
   if (!contactList) return;
 
 
-  // جلب الرسائل المحفوظة
   const messages =
     JSON.parse(
       localStorage.getItem(CONTACT_KEY) || "[]"
     );
 
 
-  // إذا لم توجد رسائل
   if (messages.length === 0) {
 
     contactList.innerHTML = `
@@ -56,20 +55,19 @@ function renderContactMessages() {
   }
 
 
-  // عرض جميع الرسائل
-  contactList.innerHTML = messages.map(
-    (message, index) => {
+  contactList.innerHTML =
+    messages.map((message, index) => {
 
       return `
+
         <div
           class="list-item"
           id="message-${index}"
           style="margin-bottom:12px;"
         >
 
-          <!-- ================================= -->
+
           <!-- عرض الرسالة -->
-          <!-- ================================= -->
 
           <div id="message-view-${index}">
 
@@ -83,6 +81,7 @@ function renderContactMessages() {
               إلى:
               ${escapeHtml(message.person)}
             </span>
+
 
             <p
               style="
@@ -99,10 +98,7 @@ function renderContactMessages() {
                 ? `
                   <small
                     class="muted"
-                    style="
-                      display:block;
-                      margin-bottom:8px;
-                    "
+                    style="display:block;margin-bottom:8px;"
                   >
                     تم تعديل الرسالة
                   </small>
@@ -111,7 +107,7 @@ function renderContactMessages() {
             }
 
 
-            <!-- أزرار التحكم -->
+            <!-- أزرار الرسالة -->
 
             <div
               style="
@@ -122,8 +118,6 @@ function renderContactMessages() {
               "
             >
 
-              <!-- زر تعديل -->
-
               <button
                 type="button"
                 class="btn secondary small"
@@ -132,8 +126,6 @@ function renderContactMessages() {
                 تعديل الرسالة
               </button>
 
-
-              <!-- زر حذف -->
 
               <button
                 type="button"
@@ -148,9 +140,7 @@ function renderContactMessages() {
           </div>
 
 
-          <!-- ================================= -->
-          <!-- منطقة تعديل الرسالة -->
-          <!-- ================================= -->
+          <!-- نموذج تعديل الرسالة -->
 
           <div
             id="message-edit-${index}"
@@ -166,25 +156,18 @@ function renderContactMessages() {
               id="message-input-${index}"
               class="input"
               rows="5"
-              style="
-                width:100%;
-                margin-top:10px;
-              "
+              style="width:100%;margin-top:10px;"
             >${escapeHtml(message.text)}</textarea>
 
-
-            <!-- أزرار الحفظ والإلغاء -->
 
             <div
               style="
                 display:flex;
                 gap:8px;
-                margin-top:10px;
                 flex-wrap:wrap;
+                margin-top:10px;
               "
             >
-
-              <!-- حفظ -->
 
               <button
                 type="button"
@@ -194,8 +177,6 @@ function renderContactMessages() {
                 حفظ التعديل
               </button>
 
-
-              <!-- إلغاء -->
 
               <button
                 type="button"
@@ -208,8 +189,6 @@ function renderContactMessages() {
             </div>
 
 
-            <!-- رسالة الخطأ -->
-
             <div
               id="edit-status-${index}"
               class="status"
@@ -218,17 +197,15 @@ function renderContactMessages() {
           </div>
 
         </div>
+
       `;
 
-    }
-  ).join("");
+    }).join("");
 
 }
 
 
-// ========================================
 // فتح تعديل الرسالة
-// ========================================
 
 function editMessage(index) {
 
@@ -252,19 +229,13 @@ function editMessage(index) {
   }
 
 
-  // إخفاء الرسالة الأصلية
-
   messageView.style.display =
     "none";
 
 
-  // إظهار صندوق التعديل
-
   messageEdit.style.display =
     "block";
 
-
-  // التركيز على مربع النص
 
   const input =
     document.getElementById(
@@ -281,9 +252,7 @@ function editMessage(index) {
 }
 
 
-// ========================================
 // حفظ تعديل الرسالة
-// ========================================
 
 function saveMessage(index) {
 
@@ -299,18 +268,12 @@ function saveMessage(index) {
     );
 
 
-  if (!input) {
-    return;
-  }
+  if (!input) return;
 
-
-  // الحصول على النص الجديد
 
   const newText =
     input.value.trim();
 
-
-  // منع الرسالة الفارغة
 
   if (newText === "") {
 
@@ -325,11 +288,8 @@ function saveMessage(index) {
     }
 
     return;
-
   }
 
-
-  // جلب الرسائل
 
   const messages =
     JSON.parse(
@@ -339,44 +299,24 @@ function saveMessage(index) {
     );
 
 
-  // التأكد من وجود الرسالة
-
   if (!messages[index]) {
-
-    if (status) {
-
-      status.className =
-        "status error";
-
-      status.textContent =
-        "حدث خطأ، لم يتم العثور على الرسالة.";
-
-    }
 
     return;
 
   }
 
 
-  // تحديث النص
-
   messages[index].text =
     newText;
 
-
-  // تسجيل أن الرسالة تم تعديلها
 
   messages[index].edited =
     true;
 
 
-  // حفظ وقت التعديل
-
   messages[index].editedAt =
     new Date().toISOString();
 
-
-  // حفظ البيانات
 
   localStorage.setItem(
     CONTACT_KEY,
@@ -384,16 +324,12 @@ function saveMessage(index) {
   );
 
 
-  // تحديث قائمة الرسائل
-
   renderContactMessages();
 
 }
 
 
-// ========================================
 // إلغاء تعديل الرسالة
-// ========================================
 
 function cancelEdit(index) {
 
@@ -417,13 +353,9 @@ function cancelEdit(index) {
   }
 
 
-  // إخفاء صندوق التعديل
-
   messageEdit.style.display =
     "none";
 
-
-  // إظهار الرسالة
 
   messageView.style.display =
     "block";
@@ -431,21 +363,15 @@ function cancelEdit(index) {
 }
 
 
-// ========================================
 // حذف الرسالة
-// ========================================
 
 function deleteMessage(index) {
-
-  // تأكيد الحذف
 
   const confirmDelete =
     confirm(
       "هل أنت متأكد أنك تريد حذف هذه الرسالة؟"
     );
 
-
-  // إذا ضغط المستخدم إلغاء
 
   if (!confirmDelete) {
 
@@ -454,8 +380,6 @@ function deleteMessage(index) {
   }
 
 
-  // جلب الرسائل
-
   const messages =
     JSON.parse(
       localStorage.getItem(
@@ -463,8 +387,6 @@ function deleteMessage(index) {
       ) || "[]"
     );
 
-
-  // التأكد من وجود الرسالة
 
   if (!messages[index]) {
 
@@ -477,15 +399,11 @@ function deleteMessage(index) {
   }
 
 
-  // حذف الرسالة
-
   messages.splice(
     index,
     1
   );
 
-
-  // حفظ القائمة الجديدة
 
   localStorage.setItem(
     CONTACT_KEY,
@@ -493,16 +411,12 @@ function deleteMessage(index) {
   );
 
 
-  // تحديث الرسائل
-
   renderContactMessages();
 
 }
 
 
-// ========================================
 // إرسال رسالة جديدة
-// ========================================
 
 function bindContactForm() {
 
@@ -512,12 +426,8 @@ function bindContactForm() {
     );
 
 
-  // إذا لم توجد صفحة التواصل
-
   if (!form) return;
 
-
-  // استقبال إرسال النموذج
 
   form.addEventListener(
     "submit",
@@ -525,8 +435,6 @@ function bindContactForm() {
 
       event.preventDefault();
 
-
-      // اسم المستخدم
 
       const senderName =
         document
@@ -537,8 +445,6 @@ function bindContactForm() {
           .trim();
 
 
-      // الشخص المراد التواصل معه
-
       const contactTo =
         document
           .getElementById(
@@ -546,8 +452,6 @@ function bindContactForm() {
           )
           .value;
 
-
-      // نص الرسالة
 
       const messageText =
         document
@@ -558,15 +462,11 @@ function bindContactForm() {
           .trim();
 
 
-      // مكان حالة الرسالة
-
       const status =
         document.getElementById(
           "contactStatus"
         );
 
-
-      // التحقق من البيانات
 
       if (
         senderName === "" ||
@@ -584,8 +484,6 @@ function bindContactForm() {
       }
 
 
-      // جلب الرسائل القديمة
-
       const messages =
         JSON.parse(
           localStorage.getItem(
@@ -593,8 +491,6 @@ function bindContactForm() {
           ) || "[]"
         );
 
-
-      // إنشاء الرسالة
 
       const newMessage = {
 
@@ -619,14 +515,10 @@ function bindContactForm() {
       };
 
 
-      // إضافة الرسالة
-
       messages.push(
         newMessage
       );
 
-
-      // حفظ الرسائل
 
       localStorage.setItem(
         CONTACT_KEY,
@@ -634,23 +526,18 @@ function bindContactForm() {
       );
 
 
-      // رسالة نجاح
-
       status.className =
         "status";
+
 
       status.textContent =
         "تم إرسال الرسالة بنجاح.";
 
 
-      // تفريغ مربع الرسالة
-
       document.getElementById(
         "messageText"
       ).value = "";
 
-
-      // تحديث القائمة
 
       renderContactMessages();
 
@@ -660,9 +547,13 @@ function bindContactForm() {
 }
 
 
+
 // ========================================
+// ================ الحسابات ===============
+// ========================================
+
+
 // عرض الحسابات
-// ========================================
 
 function renderMarketCards() {
 
@@ -672,12 +563,8 @@ function renderMarketCards() {
     );
 
 
-  // إذا لم تكن صفحة الحسابات
-
   if (!marketCards) return;
 
-
-  // جلب الحسابات
 
   const accounts =
     JSON.parse(
@@ -687,15 +574,15 @@ function renderMarketCards() {
     );
 
 
-  // إذا لا توجد حسابات
-
   if (accounts.length === 0) {
 
     marketCards.innerHTML = `
       <div class="market-card">
+
         <p class="muted">
           لا توجد حسابات معروضة حاليا.
         </p>
+
       </div>
     `;
 
@@ -704,26 +591,41 @@ function renderMarketCards() {
   }
 
 
-  // عرض الحسابات
-
   marketCards.innerHTML =
-    accounts.map(
-      (account) => {
+    accounts.map((account, index) => {
 
-        return `
-          <div class="market-card">
+      return `
 
-            ${
-              account.image
-                ? `
-                  <img
-                    src="${account.image}"
-                    alt="${escapeHtml(account.name)}"
-                  >
-                `
-                : ""
-            }
+        <div
+          class="market-card"
+          id="account-${index}"
+        >
 
+
+          <!-- صورة الحساب -->
+
+          ${
+            account.image
+              ? `
+                <img
+                  src="${account.image}"
+                  alt="${escapeHtml(account.name)}"
+                  style="
+                    width:100%;
+                    max-width:300px;
+                    height:auto;
+                    border-radius:10px;
+                    margin-bottom:10px;
+                  "
+                >
+              `
+              : ""
+          }
+
+
+          <!-- عرض بيانات الحساب -->
+
+          <div id="account-view-${index}">
 
             <h3>
               ${escapeHtml(account.name)}
@@ -737,6 +639,7 @@ function renderMarketCards() {
 
 
             <p>
+              البرايم:
               ${escapeHtml(
                 account.primeType || ""
               )}
@@ -754,18 +657,579 @@ function renderMarketCards() {
               ${escapeHtml(account.specs)}
             </p>
 
-          </div>
-        `;
 
-      }
-    ).join("");
+            ${
+              account.edited
+                ? `
+                  <small
+                    class="muted"
+                    style="display:block;margin-bottom:8px;"
+                  >
+                    تم تعديل الحساب
+                  </small>
+                `
+                : ""
+            }
+
+
+            <!-- أزرار الحساب -->
+
+            <div
+              style="
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
+                margin-top:12px;
+              "
+            >
+
+              <button
+                type="button"
+                class="btn secondary small"
+                onclick="editAccount(${index})"
+              >
+                تعديل الحساب
+              </button>
+
+
+              <button
+                type="button"
+                class="btn small"
+                onclick="deleteAccount(${index})"
+              >
+                حذف الحساب
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- ================================= -->
+          <!-- نموذج تعديل الحساب -->
+          <!-- ================================= -->
+
+          <div
+            id="account-edit-${index}"
+            style="
+              display:none;
+              margin-top:15px;
+            "
+          >
+
+
+            <label>
+              اسم الحساب
+            </label>
+
+
+            <input
+              id="edit-account-name-${index}"
+              class="input"
+              type="text"
+              value="${escapeHtml(account.name)}"
+            >
+
+
+            <label>
+              نوع الحساب
+            </label>
+
+
+            <select
+              id="edit-account-type-${index}"
+            >
+
+              <option
+                value="نادر"
+                ${
+                  account.type === "نادر"
+                    ? "selected"
+                    : ""
+                }
+              >
+                نادر
+              </option>
+
+
+              <option
+                value="كلاسيكي"
+                ${
+                  account.type === "كلاسيكي"
+                    ? "selected"
+                    : ""
+                }
+              >
+                كلاسيكي
+              </option>
+
+
+              <option
+                value="احداث"
+                ${
+                  account.type === "احداث"
+                    ? "selected"
+                    : ""
+                }
+              >
+                احداث
+              </option>
+
+
+              <option
+                value="مختلط"
+                ${
+                  account.type === "مختلط"
+                    ? "selected"
+                    : ""
+                }
+              >
+                مختلط
+              </option>
+
+            </select>
+
+
+            <label>
+              البرايم
+            </label>
+
+
+            <select
+              id="edit-account-prime-${index}"
+            >
+
+              ${
+                [
+                  "برايم 1",
+                  "برايم 2",
+                  "برايم 3",
+                  "برايم 4",
+                  "برايم 5",
+                  "برايم 6",
+                  "برايم 7",
+                  "برايم 8"
+                ]
+                .map(prime => `
+                  <option
+                    value="${prime}"
+                    ${
+                      account.primeType === prime
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    ${prime}
+                  </option>
+                `)
+                .join("")
+              }
+
+            </select>
+
+
+            <label>
+              السعر بالدينار الأردني
+            </label>
+
+
+            <input
+              id="edit-account-price-${index}"
+              class="input"
+              type="number"
+              value="${escapeHtml(account.price)}"
+            >
+
+
+            <label>
+              مواصفات الحساب
+            </label>
+
+
+            <textarea
+              id="edit-account-specs-${index}"
+              rows="4"
+            >${escapeHtml(account.specs)}</textarea>
+
+
+            <label>
+              تغيير صورة الحساب
+            </label>
+
+
+            <input
+              id="edit-account-image-${index}"
+              class="input"
+              type="file"
+              accept="image/*"
+            >
+
+
+            <!-- أزرار التعديل -->
+
+            <div
+              style="
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
+                margin-top:10px;
+              "
+            >
+
+              <button
+                type="button"
+                class="btn small"
+                onclick="saveAccountEdit(${index})"
+              >
+                حفظ التعديل
+              </button>
+
+
+              <button
+                type="button"
+                class="btn secondary small"
+                onclick="cancelAccountEdit(${index})"
+              >
+                إلغاء
+              </button>
+
+            </div>
+
+
+            <div
+              id="account-edit-status-${index}"
+              class="status"
+            ></div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
 
 }
 
 
-// ========================================
+// فتح تعديل الحساب
+
+function editAccount(index) {
+
+  const accountView =
+    document.getElementById(
+      `account-view-${index}`
+    );
+
+
+  const accountEdit =
+    document.getElementById(
+      `account-edit-${index}`
+    );
+
+
+  if (
+    !accountView ||
+    !accountEdit
+  ) {
+    return;
+  }
+
+
+  accountView.style.display =
+    "none";
+
+
+  accountEdit.style.display =
+    "block";
+
+}
+
+
+// حفظ تعديل الحساب
+
+function saveAccountEdit(index) {
+
+  const nameInput =
+    document.getElementById(
+      `edit-account-name-${index}`
+    );
+
+
+  const typeInput =
+    document.getElementById(
+      `edit-account-type-${index}`
+    );
+
+
+  const primeInput =
+    document.getElementById(
+      `edit-account-prime-${index}`
+    );
+
+
+  const priceInput =
+    document.getElementById(
+      `edit-account-price-${index}`
+    );
+
+
+  const specsInput =
+    document.getElementById(
+      `edit-account-specs-${index}`
+    );
+
+
+  const imageInput =
+    document.getElementById(
+      `edit-account-image-${index}`
+    );
+
+
+  const status =
+    document.getElementById(
+      `account-edit-status-${index}`
+    );
+
+
+  if (
+    !nameInput ||
+    !typeInput ||
+    !primeInput ||
+    !priceInput ||
+    !specsInput
+  ) {
+    return;
+  }
+
+
+  const name =
+    nameInput.value.trim();
+
+
+  const type =
+    typeInput.value;
+
+
+  const primeType =
+    primeInput.value;
+
+
+  const price =
+    priceInput.value.trim();
+
+
+  const specs =
+    specsInput.value.trim();
+
+
+  if (
+    name === "" ||
+    price === "" ||
+    specs === ""
+  ) {
+
+    if (status) {
+
+      status.className =
+        "status error";
+
+      status.textContent =
+        "يرجى تعبئة جميع البيانات.";
+
+    }
+
+    return;
+
+  }
+
+
+  const accounts =
+    JSON.parse(
+      localStorage.getItem(
+        MARKET_KEY
+      ) || "[]"
+    );
+
+
+  if (!accounts[index]) {
+
+    return;
+
+  }
+
+
+  // تحديث البيانات
+
+  accounts[index].name =
+    name;
+
+
+  accounts[index].type =
+    type;
+
+
+  accounts[index].primeType =
+    primeType;
+
+
+  accounts[index].price =
+    price;
+
+
+  accounts[index].specs =
+    specs;
+
+
+  accounts[index].edited =
+    true;
+
+
+  accounts[index].editedAt =
+    new Date().toISOString();
+
+
+  // إذا اختار صورة جديدة
+
+  if (
+    imageInput &&
+    imageInput.files &&
+    imageInput.files[0]
+  ) {
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload =
+      function() {
+
+        accounts[index].image =
+          reader.result;
+
+
+        localStorage.setItem(
+          MARKET_KEY,
+          JSON.stringify(accounts)
+        );
+
+
+        renderMarketCards();
+
+      };
+
+
+    reader.readAsDataURL(
+      imageInput.files[0]
+    );
+
+  }
+
+  else {
+
+    // حفظ بدون تغيير الصورة
+
+    localStorage.setItem(
+      MARKET_KEY,
+      JSON.stringify(accounts)
+    );
+
+
+    renderMarketCards();
+
+  }
+
+}
+
+
+// إلغاء تعديل الحساب
+
+function cancelAccountEdit(index) {
+
+  const accountView =
+    document.getElementById(
+      `account-view-${index}`
+    );
+
+
+  const accountEdit =
+    document.getElementById(
+      `account-edit-${index}`
+    );
+
+
+  if (
+    !accountView ||
+    !accountEdit
+  ) {
+    return;
+  }
+
+
+  accountEdit.style.display =
+    "none";
+
+
+  accountView.style.display =
+    "block";
+
+}
+
+
+// حذف الحساب
+
+function deleteAccount(index) {
+
+  const confirmDelete =
+    confirm(
+      "هل أنت متأكد أنك تريد حذف هذا الحساب؟"
+    );
+
+
+  if (!confirmDelete) {
+
+    return;
+
+  }
+
+
+  const accounts =
+    JSON.parse(
+      localStorage.getItem(
+        MARKET_KEY
+      ) || "[]"
+    );
+
+
+  if (!accounts[index]) {
+
+    alert(
+      "لم يتم العثور على الحساب."
+    );
+
+    return;
+
+  }
+
+
+  accounts.splice(
+    index,
+    1
+  );
+
+
+  localStorage.setItem(
+    MARKET_KEY,
+    JSON.stringify(accounts)
+  );
+
+
+  renderMarketCards();
+
+}
+
+
 // إضافة حساب جديد
-// ========================================
 
 function bindMarketForm() {
 
@@ -775,12 +1239,8 @@ function bindMarketForm() {
     );
 
 
-  // إذا لم تكن صفحة الحسابات
-
   if (!form) return;
 
-
-  // إرسال النموذج
 
   form.addEventListener(
     "submit",
@@ -788,8 +1248,6 @@ function bindMarketForm() {
 
       event.preventDefault();
 
-
-      // اسم الحساب
 
       const accountName =
         document
@@ -800,8 +1258,6 @@ function bindMarketForm() {
           .trim();
 
 
-      // نوع الحساب
-
       const accountType =
         document
           .getElementById(
@@ -810,8 +1266,6 @@ function bindMarketForm() {
           .value;
 
 
-      // نوع البرايم
-
       const primeType =
         document
           .getElementById(
@@ -819,8 +1273,6 @@ function bindMarketForm() {
           )
           .value;
 
-
-      // السعر
 
       const accountPrice =
         document
@@ -831,8 +1283,6 @@ function bindMarketForm() {
           .trim();
 
 
-      // المواصفات
-
       const accountSpecs =
         document
           .getElementById(
@@ -842,8 +1292,6 @@ function bindMarketForm() {
           .trim();
 
 
-      // صورة الحساب
-
       const imageFile =
         document
           .getElementById(
@@ -851,15 +1299,11 @@ function bindMarketForm() {
           );
 
 
-      // مكان الحالة
-
       const status =
         document.getElementById(
           "marketStatus"
         );
 
-
-      // التحقق
 
       if (
         accountName === "" ||
@@ -878,12 +1322,8 @@ function bindMarketForm() {
       }
 
 
-      // دالة حفظ الحساب
-
       const saveAccount =
         function(imageData) {
-
-          // جلب الحسابات
 
           const accounts =
             JSON.parse(
@@ -892,8 +1332,6 @@ function bindMarketForm() {
               ) || "[]"
             );
 
-
-          // إضافة الحساب
 
           accounts.push({
 
@@ -913,12 +1351,13 @@ function bindMarketForm() {
               accountSpecs,
 
             image:
-              imageData || ""
+              imageData || "",
+
+            edited:
+              false
 
           });
 
-
-          // حفظ الحسابات
 
           localStorage.setItem(
             MARKET_KEY,
@@ -926,28 +1365,23 @@ function bindMarketForm() {
           );
 
 
-          // رسالة نجاح
-
           status.className =
             "status";
+
 
           status.textContent =
             "تمت إضافة الحساب بنجاح.";
 
 
-          // إعادة تعيين النموذج
-
           form.reset();
 
-
-          // تحديث الحسابات
 
           renderMarketCards();
 
         };
 
 
-      // إذا تم اختيار صورة
+      // رفع الصورة
 
       if (
         imageFile &&
@@ -975,8 +1409,6 @@ function bindMarketForm() {
 
       }
 
-      // بدون صورة
-
       else {
 
         saveAccount("");
@@ -989,8 +1421,9 @@ function bindMarketForm() {
 }
 
 
+
 // ========================================
-// الوضع الليلي
+// =============== الوضع الليلي =============
 // ========================================
 
 function setupTheme() {
@@ -1001,15 +1434,11 @@ function setupTheme() {
     );
 
 
-  // جلب الوضع المحفوظ
-
   const savedTheme =
     localStorage.getItem(
       THEME_KEY
     );
 
-
-  // تشغيل الوضع الفاتح
 
   if (
     savedTheme === "light"
@@ -1022,33 +1451,23 @@ function setupTheme() {
   }
 
 
-  // إذا لم يوجد الزر
-
   if (!themeToggle) return;
 
-
-  // عند الضغط
 
   themeToggle.addEventListener(
     "click",
     function() {
-
-      // تبديل الوضع
 
       document.body.classList.toggle(
         "light-theme"
       );
 
 
-      // معرفة الوضع الحالي
-
       const isLight =
         document.body.classList.contains(
           "light-theme"
         );
 
-
-      // حفظ الوضع
 
       localStorage.setItem(
         THEME_KEY,
@@ -1063,8 +1482,9 @@ function setupTheme() {
 }
 
 
+
 // ========================================
-// تغيير اللغة
+// ================ تغيير اللغة ==============
 // ========================================
 
 function setupLanguage() {
@@ -1075,24 +1495,38 @@ function setupLanguage() {
     );
 
 
-  // إذا لم يوجد الزر
-
   if (!langToggle) return;
 
 
-  // عند الضغط
+  const savedLang =
+    localStorage.getItem(
+      LANG_KEY
+    );
+
+
+  if (
+    savedLang === "en"
+  ) {
+
+    document.documentElement.lang =
+      "en";
+
+    document.documentElement.dir =
+      "ltr";
+
+    langToggle.textContent =
+      "AR";
+
+  }
+
 
   langToggle.addEventListener(
     "click",
     function() {
 
-      // اللغة الحالية
-
       const currentLang =
         document.documentElement.lang;
 
-
-      // التحويل إلى الإنجليزية
 
       if (
         currentLang === "ar"
@@ -1107,15 +1541,13 @@ function setupLanguage() {
         langToggle.textContent =
           "AR";
 
+
         localStorage.setItem(
           LANG_KEY,
           "en"
         );
 
       }
-
-
-      // التحويل إلى العربية
 
       else {
 
@@ -1127,6 +1559,7 @@ function setupLanguage() {
 
         langToggle.textContent =
           "EN";
+
 
         localStorage.setItem(
           LANG_KEY,
@@ -1141,40 +1574,35 @@ function setupLanguage() {
 }
 
 
+
 // ========================================
-// تشغيل الموقع
+// ================ تشغيل الموقع =============
 // ========================================
 
 document.addEventListener(
   "DOMContentLoaded",
   function() {
 
-    // تشغيل نموذج الرسائل
+    // الرسائل
 
     bindContactForm();
-
-
-    // عرض الرسائل
 
     renderContactMessages();
 
 
-    // تشغيل نموذج الحسابات
+    // الحسابات
 
     bindMarketForm();
-
-
-    // عرض الحسابات
 
     renderMarketCards();
 
 
-    // تشغيل الوضع الليلي
+    // الوضع الليلي
 
     setupTheme();
 
 
-    // تشغيل اللغة
+    // اللغة
 
     setupLanguage();
 
