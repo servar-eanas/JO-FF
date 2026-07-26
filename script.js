@@ -1,257 +1,52 @@
-const STORAGE_KEY = 'clan_member_data';
-const CONTACT_KEY = 'clan_contact_messages';
-const MARKET_KEY = 'clan_market_accounts';
-const USER_KEY = 'user';
+// ========================================
+// إعدادات التخزين
+// ========================================
 
-const competitionDetails = {
-  clash: {
-    title: 'مسابقة Clash Squad',
-    mode: 'نظام 5v5',
-    reward: 'جائزة فورية + نقاط ترتيب',
-    description: 'تُقام المسابقة بشكل أسبوعي وتتميز بتقسيم الفرق حسب مستوى الأداء، مع نظام نقاط واضح لاحتساب النتائج.'
-  },
-  battle: {
-    title: 'بطولة Battle Royale',
-    mode: 'نظام فرق مفتوح',
-    reward: 'جوائز شهرية + تمييز في قائمة الكلان',
-    description: 'تُعقد البطولة بشكل شهري وتُركز على التنسيق داخل الفريق، واستغلال الخريطة بذكاء لتحصيل أعلى نتائج.'
-  },
-  rewards: {
-    title: 'مكافآت الأعضاء',
-    mode: 'مكافآت مستمرة',
-    reward: 'مكافآت تشجيعية وامتيازات خاصة',
-    description: 'يتم منح المكافآت للأعضاء المبدعين والمنتظمين داخل الفعاليات، كما تُشجع روح التفاعل والالتزام.'
-  }
-};
-
-const translations = {
-  ar: {
-    nav_intro: 'المقدمة',
-    nav_clan: 'عن الكلان',
-    nav_competitions: 'المسابقات',
-    nav_contact: 'التواصل',
-    nav_market: 'الحسابات',
-    nav_links: 'الروابط',
-    intro_title: 'مرحباً بك في كيان JO FF',
-    intro_text1: 'الكلان JO FF هو مجتمع لعب احترافي في Free Fire يضم لاعبين من مختلف المستويات، ويهتم بتطوير الأداء داخل Clash Squad و Battle Royale عبر تنظيم فعاليات، تدريب مستمر، وتوزيع مهام واضحة بين الأعضاء.',
-    intro_text2: 'في الكلان نركز على روح الفريق والعمل الجماعي، مع حرص خاص على احترام النظام، الالتزام بالقواعد، وتحفيز اللاعبين على التقدم مستواهم بانتظام في كل يوم.',
-    current_member: 'العضو الحالي',
-    intro_features: 'أبرز المميزات',
-    feature_1: 'تنظيم لفرق اللعب حسب المستوى',
-    feature_2: 'خطة تدريب يومية وسباق رتب',
-    feature_3: 'مسابقات أسبوعية وبوابة تواصل',
-    focus_title: 'التركيز',
-    focus_text: 'تنسيق ممتاز داخل الفرق',
-    identity_title: 'العلامة',
-    identity_text: 'روح تفاعل ومشاركة قوية',
-    goal_title: 'الهدف',
-    goal_text: 'رفع مستوى الكلان ببطولة وتنظيم',
-    social_title: 'حسابات الكلان الرسمية',
-    market_title: 'بيع وشراء الحسابات داخل اللعبة',
-    market_desc: 'يمكنك عرض الحسابات المتاحة للبيع، مع صورة، السعر، مواصفات الحساب، وروابط التواصل مع الكلان والقيادة.',
-    market_form: 'إضافة حساب جديد',
-    label_name: 'اسم الحساب',
-    label_type: 'نوع الحساب',
-    label_price: 'السعر بالدينار الأردني',
-    label_upload: 'رفع صورة من الجهاز',
-    label_specs: 'مواصفات الحساب',
-    btn_add: 'إضافة الحساب',
-    clan_title: 'اسم الكلان',
-    clan_category: 'التصنيف',
-    clan_roles: 'أدوار الإدارة',
-    clan_play_style: 'نمط اللعب',
-    competitions_title: 'المسابقات',
-    contacts_title: 'تواصل مع الإداريين',
-    contact_message_title: 'الرسائل المرسلة'
-  },
-
-  en: {
-    nav_intro: 'Intro',
-    nav_clan: 'Clan',
-    nav_competitions: 'Competitions',
-    nav_contact: 'Contact',
-    nav_market: 'Accounts',
-    nav_links: 'Links',
-    intro_title: 'Welcome to JO FF Clan',
-    intro_text1: 'JO FF Clan is a professional Free Fire community that brings together players of all levels and focuses on improving performance in Clash Squad and Battle Royale through structured events, continuous training, and clear role distribution.',
-    intro_text2: 'Our clan focuses on teamwork, discipline, and constant progress, with a strong commitment to rules, coordination, and sharing positive energy among members.',
-    current_member: 'Current member',
-    intro_features: 'Key Features',
-    feature_1: 'Organized team setup by skill level',
-    feature_2: 'Daily training plan and rank progression',
-    feature_3: 'Weekly competitions and communication hub',
-    focus_title: 'Focus',
-    focus_text: 'Excellent coordination inside teams',
-    identity_title: 'Identity',
-    identity_text: 'Strong engagement and community spirit',
-    goal_title: 'Goal',
-    goal_text: 'Raise the clan to a higher competitive level',
-    social_title: 'Official Clan Accounts',
-    market_title: 'Buy and Sell Game Accounts',
-    market_desc: 'You can list available accounts for sale with a photo, price, account specifications, and links to the clan and leadership.',
-    market_form: 'Add a New Account',
-    label_name: 'Account Name',
-    label_type: 'Account Type',
-    label_price: 'Price in Jordanian Dinar',
-    label_upload: 'Upload image from device',
-    label_specs: 'Account Specifications',
-    btn_add: 'Add Account',
-    clan_title: 'Clan Name',
-    clan_category: 'Category',
-    clan_roles: 'Management Roles',
-    clan_play_style: 'Play Style',
-    competitions_title: 'Competitions',
-    contacts_title: 'Contact Admins',
-    contact_message_title: 'Sent Messages'
-  }
-};
+const CONTACT_KEY = "clan_contact_messages";
+const MARKET_KEY = "clan_market_accounts";
+const USER_KEY = "user";
+const THEME_KEY = "clan_theme";
+const LANG_KEY = "clan_lang";
 
 
 // ========================================
-// وظائف البيانات وتسجيل الدخول
+// حماية النصوص من أكواد HTML
 // ========================================
 
-function getStoredData() {
-  const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  return parsed;
-}
-
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function isLoggedIn() {
-  return !!(
-    localStorage.getItem('clan_logged_in') ||
-    localStorage.getItem(USER_KEY)
-  );
+function escapeHtml(text) {
+  return String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
 // ========================================
-// حماية النصوص من HTML
-// ========================================
-
-function escapeHtml(value) {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-
-// ========================================
-// عرض الحسابات
-// ========================================
-
-function renderAccountCards() {
-  const accounts = [
-    {
-      name: 'الـ Account 1',
-      type: 'Battle Royale',
-      status: 'متوفر'
-    },
-    {
-      name: 'الـ Account 2',
-      type: 'Clash Squad',
-      status: 'متوفر'
-    },
-    {
-      name: 'الـ Account 3',
-      type: 'Rifles / Rank',
-      status: 'مغلق مؤقتاً'
-    }
-  ];
-
-  const container = document.getElementById('accountCards');
-
-  if (!container) return;
-
-  container.innerHTML = accounts.map(acc => `
-    <div class="panel">
-      <span class="badge">${escapeHtml(acc.type)}</span>
-      <h3>${escapeHtml(acc.name)}</h3>
-      <p class="muted">الحالة: ${escapeHtml(acc.status)}</p>
-    </div>
-  `).join('');
-}
-
-
-// ========================================
-// عرض حسابات السوق
-// ========================================
-
-function renderMarketCards() {
-  const container = document.getElementById('marketCards');
-
-  if (!container) return;
-
-  const stored = JSON.parse(
-    localStorage.getItem(MARKET_KEY) || '[]'
-  );
-
-  if (!stored.length) {
-    container.innerHTML = `
-      <div class="market-card">
-        <p class="muted">
-          لا توجد حسابات معروضة حاليًا.
-        </p>
-      </div>
-    `;
-
-    return;
-  }
-
-  container.innerHTML = stored.map(item => `
-    <div class="market-card">
-
-      <img
-        src="${item.image || 'https://via.placeholder.com/800x400?text=Account'}"
-        alt="${escapeHtml(item.name)}"
-      />
-
-      <h3>${escapeHtml(item.name)}</h3>
-
-      <p class="muted">
-        ${escapeHtml(item.type)}
-        •
-        ${escapeHtml(item.primeType || 'برايم غير محدد')}
-      </p>
-
-      <p>
-        ${escapeHtml(item.specs)}
-      </p>
-
-      <div class="price-tag">
-        ${escapeHtml(item.price)} د.ا
-      </div>
-
-    </div>
-  `).join('');
-}
-
-
-// ========================================
-// عرض الرسائل + تعديل الرسائل
+// الرسائل - عرض الرسائل
 // ========================================
 
 function renderContactMessages() {
 
-  const list = document.getElementById('contactList');
+  const contactList =
+    document.getElementById("contactList");
 
-  if (!list) return;
+  // إذا لم تكن صفحة التواصل موجودة
+  if (!contactList) return;
 
-  const messages = JSON.parse(
-    localStorage.getItem(CONTACT_KEY) || '[]'
-  );
 
-  const currentUser = localStorage.getItem(USER_KEY) || '';
+  // جلب الرسائل المحفوظة
+  const messages =
+    JSON.parse(
+      localStorage.getItem(CONTACT_KEY) || "[]"
+    );
 
-  if (!messages.length) {
 
-    list.innerHTML = `
+  // إذا لم توجد رسائل
+  if (messages.length === 0) {
+
+    contactList.innerHTML = `
       <div class="list-item">
         لا توجد رسائل حتى الآن.
       </div>
@@ -261,601 +56,577 @@ function renderContactMessages() {
   }
 
 
-  list.innerHTML = messages.map((msg, index) => {
+  // عرض جميع الرسائل
+  contactList.innerHTML = messages.map(
+    (message, index) => {
 
-    /*
-      السماح بالتعديل فقط إذا كان اسم الرسالة
-      يطابق اسم المستخدم المسجل دخوله.
-    */
-
-    const canEdit =
-      currentUser &&
-      msg.name === currentUser;
-
-
-    return `
-
-      <div
-        class="list-item message-item"
-        data-message-index="${index}"
-      >
-
-        <!-- عرض الرسالة -->
-
+      return `
         <div
-          id="message-view-${index}"
-          class="message-view"
+          class="list-item"
+          id="message-${index}"
+          style="margin-bottom:12px;"
         >
 
-          <strong>
-            ${escapeHtml(msg.name)}
-          </strong>
+          <!-- ================================= -->
+          <!-- عرض الرسالة -->
+          <!-- ================================= -->
 
-          <br>
+          <div id="message-view-${index}">
 
-          <span class="muted">
-            إلى: ${escapeHtml(msg.person)}
-          </span>
+            <strong>
+              ${escapeHtml(message.name)}
+            </strong>
 
-          <br>
+            <br>
 
-          <div style="margin-top: 8px;">
-            ${escapeHtml(msg.text)}
+            <span class="muted">
+              إلى:
+              ${escapeHtml(message.person)}
+            </span>
+
+            <p
+              style="
+                margin-top:10px;
+                white-space:pre-wrap;
+              "
+            >
+              ${escapeHtml(message.text)}
+            </p>
+
+
+            ${
+              message.edited
+                ? `
+                  <small
+                    class="muted"
+                    style="
+                      display:block;
+                      margin-bottom:8px;
+                    "
+                  >
+                    تم تعديل الرسالة
+                  </small>
+                `
+                : ""
+            }
+
+
+            <!-- أزرار التحكم -->
+
+            <div
+              style="
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
+                margin-top:10px;
+              "
+            >
+
+              <!-- زر تعديل -->
+
+              <button
+                type="button"
+                class="btn secondary small"
+                onclick="editMessage(${index})"
+              >
+                تعديل الرسالة
+              </button>
+
+
+              <!-- زر حذف -->
+
+              <button
+                type="button"
+                class="btn small"
+                onclick="deleteMessage(${index})"
+              >
+                حذف الرسالة
+              </button>
+
+            </div>
+
           </div>
 
 
-          ${
-            msg.edited
-              ? `
-                <small
-                  class="muted"
-                  style="display:block; margin-top:6px;"
-                >
-                  تم تعديل الرسالة
-                </small>
-              `
-              : ''
-          }
+          <!-- ================================= -->
+          <!-- منطقة تعديل الرسالة -->
+          <!-- ================================= -->
+
+          <div
+            id="message-edit-${index}"
+            style="display:none;"
+          >
+
+            <label>
+              تعديل الرسالة
+            </label>
 
 
-          ${
-            canEdit
-              ? `
+            <textarea
+              id="message-input-${index}"
+              class="input"
+              rows="5"
+              style="
+                width:100%;
+                margin-top:10px;
+              "
+            >${escapeHtml(message.text)}</textarea>
 
-                <button
-                  type="button"
-                  class="btn secondary small edit-message-btn"
-                  data-index="${index}"
-                  style="margin-top:10px;"
-                >
-                  تعديل الرسالة
-                </button>
 
-              `
-              : ''
-          }
+            <!-- أزرار الحفظ والإلغاء -->
+
+            <div
+              style="
+                display:flex;
+                gap:8px;
+                margin-top:10px;
+                flex-wrap:wrap;
+              "
+            >
+
+              <!-- حفظ -->
+
+              <button
+                type="button"
+                class="btn small"
+                onclick="saveMessage(${index})"
+              >
+                حفظ التعديل
+              </button>
+
+
+              <!-- إلغاء -->
+
+              <button
+                type="button"
+                class="btn secondary small"
+                onclick="cancelEdit(${index})"
+              >
+                إلغاء
+              </button>
+
+            </div>
+
+
+            <!-- رسالة الخطأ -->
+
+            <div
+              id="edit-status-${index}"
+              class="status"
+            ></div>
+
+          </div>
 
         </div>
+      `;
 
-
-        <!-- منطقة تعديل الرسالة -->
-
-        ${
-          canEdit
-            ? `
-
-              <div
-                id="message-edit-${index}"
-                class="message-edit"
-                style="display:none; margin-top:10px;"
-              >
-
-                <textarea
-                  class="input edit-message-input"
-                  rows="5"
-                  style="width:100%;"
-                >${escapeHtml(msg.text)}</textarea>
-
-
-                <div
-                  style="
-                    display:flex;
-                    gap:8px;
-                    margin-top:10px;
-                    flex-wrap:wrap;
-                  "
-                >
-
-                  <button
-                    type="button"
-                    class="btn save-message-btn"
-                    data-index="${index}"
-                  >
-                    حفظ التعديل
-                  </button>
-
-
-                  <button
-                    type="button"
-                    class="btn secondary cancel-message-btn"
-                    data-index="${index}"
-                  >
-                    إلغاء
-                  </button>
-
-                </div>
-
-
-                <div
-                  id="edit-status-${index}"
-                  class="status"
-                  style="margin-top:8px;"
-                ></div>
-
-              </div>
-
-            `
-            : ''
-        }
-
-      </div>
-
-    `;
-
-  }).join('');
-
-
-  // ========================================
-  // زر تعديل الرسالة
-  // ========================================
-
-  list
-    .querySelectorAll('.edit-message-btn')
-    .forEach(button => {
-
-      button.addEventListener('click', () => {
-
-        const index =
-          Number(button.dataset.index);
-
-        const view =
-          document.getElementById(
-            `message-view-${index}`
-          );
-
-        const edit =
-          document.getElementById(
-            `message-edit-${index}`
-          );
-
-
-        if (view && edit) {
-
-          view.style.display = 'none';
-
-          edit.style.display = 'block';
-
-          const input =
-            edit.querySelector(
-              '.edit-message-input'
-            );
-
-          if (input) {
-
-            input.focus();
-
-            input.setSelectionRange(
-              input.value.length,
-              input.value.length
-            );
-
-          }
-
-        }
-
-      });
-
-    });
-
-
-  // ========================================
-  // زر إلغاء التعديل
-  // ========================================
-
-  list
-    .querySelectorAll('.cancel-message-btn')
-    .forEach(button => {
-
-      button.addEventListener('click', () => {
-
-        renderContactMessages();
-
-      });
-
-    });
-
-
-  // ========================================
-  // زر حفظ التعديل
-  // ========================================
-
-  list
-    .querySelectorAll('.save-message-btn')
-    .forEach(button => {
-
-      button.addEventListener('click', () => {
-
-        const index =
-          Number(button.dataset.index);
-
-
-        const editBox =
-          document.getElementById(
-            `message-edit-${index}`
-          );
-
-
-        const input =
-          editBox.querySelector(
-            '.edit-message-input'
-          );
-
-
-        const status =
-          document.getElementById(
-            `edit-status-${index}`
-          );
-
-
-        if (!input || !status) return;
-
-
-        const newText =
-          input.value.trim();
-
-
-        // التحقق من أن الرسالة ليست فارغة
-
-        if (!newText) {
-
-          status.className =
-            'status error';
-
-          status.textContent =
-            'لا يمكن حفظ رسالة فارغة.';
-
-          return;
-
-        }
-
-
-        // جلب الرسائل من التخزين
-
-        const messages =
-          JSON.parse(
-            localStorage.getItem(
-              CONTACT_KEY
-            ) || '[]'
-          );
-
-
-        // التحقق من وجود الرسالة
-
-        if (!messages[index]) {
-
-          status.className =
-            'status error';
-
-          status.textContent =
-            'تعذر العثور على الرسالة.';
-
-          return;
-
-        }
-
-
-        // التحقق من المستخدم الحالي
-
-        const currentUser =
-          localStorage.getItem(
-            USER_KEY
-          ) || '';
-
-
-        if (
-          messages[index].name !==
-          currentUser
-        ) {
-
-          status.className =
-            'status error';
-
-          status.textContent =
-            'لا يمكنك تعديل هذه الرسالة.';
-
-          return;
-
-        }
-
-
-        // تحديث الرسالة
-
-        messages[index].text =
-          newText;
-
-
-        // تسجيل أن الرسالة تم تعديلها
-
-        messages[index].edited =
-          true;
-
-
-        messages[index].editedAt =
-          new Date().toISOString();
-
-
-        // حفظ الرسالة
-
-        localStorage.setItem(
-          CONTACT_KEY,
-          JSON.stringify(messages)
-        );
-
-
-        // إعادة عرض الرسائل
-
-        renderContactMessages();
-
-      });
-
-    });
+    }
+  ).join("");
 
 }
 
 
 // ========================================
-// تسجيل الدخول
+// فتح تعديل الرسالة
 // ========================================
 
-function bindLoginForm() {
+function editMessage(index) {
 
-  const form =
+  const messageView =
     document.getElementById(
-      'loginForm'
+      `message-view-${index}`
     );
 
-  if (!form) return;
 
-
-  const stored =
-    getStoredData();
-
-
-  if (stored.username) {
-
+  const messageEdit =
     document.getElementById(
-      'username'
-    ).value =
-      stored.username;
+      `message-edit-${index}`
+    );
+
+
+  if (
+    !messageView ||
+    !messageEdit
+  ) {
+    return;
+  }
+
+
+  // إخفاء الرسالة الأصلية
+
+  messageView.style.display =
+    "none";
+
+
+  // إظهار صندوق التعديل
+
+  messageEdit.style.display =
+    "block";
+
+
+  // التركيز على مربع النص
+
+  const input =
+    document.getElementById(
+      `message-input-${index}`
+    );
+
+
+  if (input) {
+
+    input.focus();
+
+  }
+
+}
+
+
+// ========================================
+// حفظ تعديل الرسالة
+// ========================================
+
+function saveMessage(index) {
+
+  const input =
+    document.getElementById(
+      `message-input-${index}`
+    );
+
+
+  const status =
+    document.getElementById(
+      `edit-status-${index}`
+    );
+
+
+  if (!input) {
+    return;
+  }
+
+
+  // الحصول على النص الجديد
+
+  const newText =
+    input.value.trim();
+
+
+  // منع الرسالة الفارغة
+
+  if (newText === "") {
+
+    if (status) {
+
+      status.className =
+        "status error";
+
+      status.textContent =
+        "لا يمكن أن تكون الرسالة فارغة.";
+
+    }
+
+    return;
 
   }
 
 
-  form.addEventListener(
-    'submit',
-    (e) => {
+  // جلب الرسائل
 
-      e.preventDefault();
-
-
-      const username =
-        document
-          .getElementById(
-            'username'
-          )
-          .value
-          .trim();
+  const messages =
+    JSON.parse(
+      localStorage.getItem(
+        CONTACT_KEY
+      ) || "[]"
+    );
 
 
-      const password =
-        document
-          .getElementById(
-            'password'
-          )
-          .value
-          .trim();
+  // التأكد من وجود الرسالة
 
+  if (!messages[index]) {
 
-      const status =
-        document.getElementById(
-          'loginStatus'
-        );
-
-
-      if (!username || !password) {
-
-        status.className =
-          'status error';
-
-        status.textContent =
-          'يرجى إدخال الاسم وكلمة المرور.';
-
-        return;
-
-      }
-
-
-      saveData({
-        username,
-        password
-      });
-
-
-      localStorage.setItem(
-        USER_KEY,
-        username
-      );
-
-
-      localStorage.setItem(
-        'clan_logged_in',
-        'true'
-      );
-
+    if (status) {
 
       status.className =
-        'status';
-
+        "status error";
 
       status.textContent =
-        'تم تسجيل الدخول بنجاح، جاري التوجيه...';
-
-
-      setTimeout(
-        () => {
-          window.location.href =
-            'intro.html';
-        },
-        800
-      );
+        "حدث خطأ، لم يتم العثور على الرسالة.";
 
     }
+
+    return;
+
+  }
+
+
+  // تحديث النص
+
+  messages[index].text =
+    newText;
+
+
+  // تسجيل أن الرسالة تم تعديلها
+
+  messages[index].edited =
+    true;
+
+
+  // حفظ وقت التعديل
+
+  messages[index].editedAt =
+    new Date().toISOString();
+
+
+  // حفظ البيانات
+
+  localStorage.setItem(
+    CONTACT_KEY,
+    JSON.stringify(messages)
   );
+
+
+  // تحديث قائمة الرسائل
+
+  renderContactMessages();
 
 }
 
 
 // ========================================
-// إرسال الرسائل
+// إلغاء تعديل الرسالة
+// ========================================
+
+function cancelEdit(index) {
+
+  const messageView =
+    document.getElementById(
+      `message-view-${index}`
+    );
+
+
+  const messageEdit =
+    document.getElementById(
+      `message-edit-${index}`
+    );
+
+
+  if (
+    !messageView ||
+    !messageEdit
+  ) {
+    return;
+  }
+
+
+  // إخفاء صندوق التعديل
+
+  messageEdit.style.display =
+    "none";
+
+
+  // إظهار الرسالة
+
+  messageView.style.display =
+    "block";
+
+}
+
+
+// ========================================
+// حذف الرسالة
+// ========================================
+
+function deleteMessage(index) {
+
+  // تأكيد الحذف
+
+  const confirmDelete =
+    confirm(
+      "هل أنت متأكد أنك تريد حذف هذه الرسالة؟"
+    );
+
+
+  // إذا ضغط المستخدم إلغاء
+
+  if (!confirmDelete) {
+
+    return;
+
+  }
+
+
+  // جلب الرسائل
+
+  const messages =
+    JSON.parse(
+      localStorage.getItem(
+        CONTACT_KEY
+      ) || "[]"
+    );
+
+
+  // التأكد من وجود الرسالة
+
+  if (!messages[index]) {
+
+    alert(
+      "لم يتم العثور على الرسالة."
+    );
+
+    return;
+
+  }
+
+
+  // حذف الرسالة
+
+  messages.splice(
+    index,
+    1
+  );
+
+
+  // حفظ القائمة الجديدة
+
+  localStorage.setItem(
+    CONTACT_KEY,
+    JSON.stringify(messages)
+  );
+
+
+  // تحديث الرسائل
+
+  renderContactMessages();
+
+}
+
+
+// ========================================
+// إرسال رسالة جديدة
 // ========================================
 
 function bindContactForm() {
 
   const form =
     document.getElementById(
-      'contactForm'
+      "contactForm"
     );
+
+
+  // إذا لم توجد صفحة التواصل
 
   if (!form) return;
 
 
-  const senderName =
-    document.getElementById(
-      'senderName'
-    );
-
-
-  /*
-    إذا كان المستخدم مسجل الدخول،
-    يتم وضع اسمه تلقائيا.
-  */
-
-  const loggedInUser =
-    localStorage.getItem(
-      USER_KEY
-    );
-
-
-  if (
-    loggedInUser &&
-    senderName
-  ) {
-
-    senderName.value =
-      loggedInUser;
-
-    senderName.readOnly =
-      true;
-
-  }
-
+  // استقبال إرسال النموذج
 
   form.addEventListener(
-    'submit',
-    (e) => {
+    "submit",
+    function(event) {
 
-      e.preventDefault();
-
-
-      const typedName =
-        senderName.value.trim();
+      event.preventDefault();
 
 
-      const loggedUser =
-        localStorage.getItem(
-          USER_KEY
-        ) || '';
+      // اسم المستخدم
 
-
-      /*
-        استخدام اسم الحساب المسجل
-        بدلا من الاسم المكتوب يدويا.
-      */
-
-      const name =
-        loggedUser ||
-        typedName;
-
-
-      const person =
+      const senderName =
         document
           .getElementById(
-            'contactTo'
-          )
-          .value;
-
-
-      const text =
-        document
-          .getElementById(
-            'messageText'
+            "senderName"
           )
           .value
           .trim();
 
 
+      // الشخص المراد التواصل معه
+
+      const contactTo =
+        document
+          .getElementById(
+            "contactTo"
+          )
+          .value;
+
+
+      // نص الرسالة
+
+      const messageText =
+        document
+          .getElementById(
+            "messageText"
+          )
+          .value
+          .trim();
+
+
+      // مكان حالة الرسالة
+
       const status =
         document.getElementById(
-          'contactStatus'
+          "contactStatus"
         );
 
 
-      if (!name || !text) {
+      // التحقق من البيانات
+
+      if (
+        senderName === "" ||
+        messageText === ""
+      ) {
 
         status.className =
-          'status error';
+          "status error";
 
         status.textContent =
-          'يرجى تعبئة الاسم والنص.';
+          "يرجى كتابة الاسم والرسالة.";
 
         return;
 
       }
 
 
+      // جلب الرسائل القديمة
+
       const messages =
         JSON.parse(
           localStorage.getItem(
             CONTACT_KEY
-          ) || '[]'
+          ) || "[]"
         );
 
 
-      messages.push({
+      // إنشاء الرسالة
 
-        name: name,
+      const newMessage = {
 
-        person: person,
+        id:
+          Date.now(),
 
-        text: text,
+        name:
+          senderName,
 
-        edited: false,
+        person:
+          contactTo,
+
+        text:
+          messageText,
+
+        edited:
+          false,
 
         createdAt:
           new Date().toISOString()
 
-      });
+      };
 
+
+      // إضافة الرسالة
+
+      messages.push(
+        newMessage
+      );
+
+
+      // حفظ الرسائل
 
       localStorage.setItem(
         CONTACT_KEY,
@@ -863,18 +634,23 @@ function bindContactForm() {
       );
 
 
-      status.className =
-        'status';
+      // رسالة نجاح
 
+      status.className =
+        "status";
 
       status.textContent =
-        'تم حفظ الرسالة بنجاح.';
+        "تم إرسال الرسالة بنجاح.";
 
+
+      // تفريغ مربع الرسالة
 
       document.getElementById(
-        'messageText'
-      ).value = '';
+        "messageText"
+      ).value = "";
 
+
+      // تحديث القائمة
 
       renderContactMessages();
 
@@ -885,271 +661,327 @@ function bindContactForm() {
 
 
 // ========================================
-// اختيار المسابقات
+// عرض الحسابات
 // ========================================
 
-function bindCompetitionSelector() {
+function renderMarketCards() {
 
-  const select =
+  const marketCards =
     document.getElementById(
-      'competitionSelect'
+      "marketCards"
     );
 
 
-  const details =
-    document.getElementById(
-      'competitionDetails'
+  // إذا لم تكن صفحة الحسابات
+
+  if (!marketCards) return;
+
+
+  // جلب الحسابات
+
+  const accounts =
+    JSON.parse(
+      localStorage.getItem(
+        MARKET_KEY
+      ) || "[]"
     );
 
 
-  if (
-    !select ||
-    !details
-  ) return;
+  // إذا لا توجد حسابات
 
+  if (accounts.length === 0) {
 
-  const renderDetails = () => {
-
-    const item =
-      competitionDetails[
-        select.value
-      ];
-
-
-    if (!item) return;
-
-
-    details.innerHTML = `
-
-      <h4>
-        ${escapeHtml(item.title)}
-      </h4>
-
-      <p>
-        <strong>النمط:</strong>
-        ${escapeHtml(item.mode)}
-      </p>
-
-      <p>
-        <strong>الجائزة:</strong>
-        ${escapeHtml(item.reward)}
-      </p>
-
-      <p>
-        <strong>الوصف:</strong>
-        ${escapeHtml(item.description)}
-      </p>
-
+    marketCards.innerHTML = `
+      <div class="market-card">
+        <p class="muted">
+          لا توجد حسابات معروضة حاليا.
+        </p>
+      </div>
     `;
 
-  };
+    return;
+
+  }
 
 
-  select.addEventListener(
-    'change',
-    renderDetails
-  );
+  // عرض الحسابات
+
+  marketCards.innerHTML =
+    accounts.map(
+      (account) => {
+
+        return `
+          <div class="market-card">
+
+            ${
+              account.image
+                ? `
+                  <img
+                    src="${account.image}"
+                    alt="${escapeHtml(account.name)}"
+                  >
+                `
+                : ""
+            }
 
 
-  renderDetails();
+            <h3>
+              ${escapeHtml(account.name)}
+            </h3>
+
+
+            <p>
+              النوع:
+              ${escapeHtml(account.type)}
+            </p>
+
+
+            <p>
+              ${escapeHtml(
+                account.primeType || ""
+              )}
+            </p>
+
+
+            <p>
+              السعر:
+              ${escapeHtml(account.price)}
+              دينار
+            </p>
+
+
+            <p>
+              ${escapeHtml(account.specs)}
+            </p>
+
+          </div>
+        `;
+
+      }
+    ).join("");
 
 }
 
 
 // ========================================
-// إضافة حساب للسوق
+// إضافة حساب جديد
 // ========================================
 
 function bindMarketForm() {
 
   const form =
     document.getElementById(
-      'marketForm'
+      "marketForm"
     );
 
+
+  // إذا لم تكن صفحة الحسابات
 
   if (!form) return;
 
 
-  const imageInput =
-    document.getElementById(
-      'accountImageFile'
-    );
-
-
-  const preview =
-    document.createElement(
-      'img'
-    );
-
-
-  preview.className =
-    'preview-box';
-
-
-  form.appendChild(
-    preview
-  );
-
-
-  imageInput.addEventListener(
-    'change',
-    () => {
-
-      const file =
-        imageInput.files[0];
-
-
-      if (!file) return;
-
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        () => {
-
-          preview.src =
-            reader.result;
-
-
-          preview.style.display =
-            'block';
-
-        };
-
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-  );
-
+  // إرسال النموذج
 
   form.addEventListener(
-    'submit',
-    (e) => {
+    "submit",
+    function(event) {
 
-      e.preventDefault();
+      event.preventDefault();
 
 
-      const name =
+      // اسم الحساب
+
+      const accountName =
         document
           .getElementById(
-            'accountName'
+            "accountName"
           )
           .value
           .trim();
 
 
-      const type =
+      // نوع الحساب
+
+      const accountType =
         document
           .getElementById(
-            'accountType'
+            "accountType"
           )
           .value;
 
+
+      // نوع البرايم
 
       const primeType =
         document
           .getElementById(
-            'primeType'
+            "primeType"
           )
           .value;
 
 
-      const price =
+      // السعر
+
+      const accountPrice =
         document
           .getElementById(
-            'accountPrice'
+            "accountPrice"
           )
           .value
           .trim();
 
 
-      const specs =
+      // المواصفات
+
+      const accountSpecs =
         document
           .getElementById(
-            'accountSpecs'
+            "accountSpecs"
           )
           .value
           .trim();
 
+
+      // صورة الحساب
+
+      const imageFile =
+        document
+          .getElementById(
+            "accountImageFile"
+          );
+
+
+      // مكان الحالة
 
       const status =
         document.getElementById(
-          'marketStatus'
+          "marketStatus"
         );
 
 
+      // التحقق
+
       if (
-        !name ||
-        !price ||
-        !specs
+        accountName === "" ||
+        accountPrice === "" ||
+        accountSpecs === ""
       ) {
 
         status.className =
-          'status error';
+          "status error";
 
         status.textContent =
-          'يرجى تعبئة اسم الحساب والسعر والمواصفات.';
+          "يرجى تعبئة جميع البيانات.";
 
         return;
 
       }
 
 
-      const accounts =
-        JSON.parse(
-          localStorage.getItem(
-            MARKET_KEY
-          ) || '[]'
+      // دالة حفظ الحساب
+
+      const saveAccount =
+        function(imageData) {
+
+          // جلب الحسابات
+
+          const accounts =
+            JSON.parse(
+              localStorage.getItem(
+                MARKET_KEY
+              ) || "[]"
+            );
+
+
+          // إضافة الحساب
+
+          accounts.push({
+
+            name:
+              accountName,
+
+            type:
+              accountType,
+
+            primeType:
+              primeType,
+
+            price:
+              accountPrice,
+
+            specs:
+              accountSpecs,
+
+            image:
+              imageData || ""
+
+          });
+
+
+          // حفظ الحسابات
+
+          localStorage.setItem(
+            MARKET_KEY,
+            JSON.stringify(accounts)
+          );
+
+
+          // رسالة نجاح
+
+          status.className =
+            "status";
+
+          status.textContent =
+            "تمت إضافة الحساب بنجاح.";
+
+
+          // إعادة تعيين النموذج
+
+          form.reset();
+
+
+          // تحديث الحسابات
+
+          renderMarketCards();
+
+        };
+
+
+      // إذا تم اختيار صورة
+
+      if (
+        imageFile &&
+        imageFile.files &&
+        imageFile.files[0]
+      ) {
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          function() {
+
+            saveAccount(
+              reader.result
+            );
+
+          };
+
+
+        reader.readAsDataURL(
+          imageFile.files[0]
         );
 
+      }
 
-      accounts.push({
+      // بدون صورة
 
-        name,
+      else {
 
-        type,
+        saveAccount("");
 
-        primeType,
-
-        price:
-          Number(price),
-
-        image:
-          preview.src || '',
-
-        specs
-
-      });
-
-
-      localStorage.setItem(
-        MARKET_KEY,
-        JSON.stringify(accounts)
-      );
-
-
-      status.className =
-        'status';
-
-
-      status.textContent =
-        'تمت إضافة الحساب بنجاح.';
-
-
-      form.reset();
-
-
-      preview.style.display =
-        'none';
-
-
-      renderMarketCards();
+      }
 
     }
   );
@@ -1158,103 +990,75 @@ function bindMarketForm() {
 
 
 // ========================================
-// حماية الصفحات
+// الوضع الليلي
 // ========================================
 
-function enforceLogin() {
+function setupTheme() {
 
-  const currentPage =
-    window.location.pathname
-      .split('/')
-      .pop();
-
-
-  const protectedPages = [
-
-    'intro.html',
-
-    'clan.html',
-
-    'competitions.html',
-
-    'contact.html',
-
-    'accounts.html',
-
-    'links.html'
-
-  ];
-
-
-  if (
-    !isLoggedIn() &&
-    currentPage !== 'index.html'
-  ) {
-
-    window.location.href =
-      'index.html';
-
-  }
-
-
-  if (
-    isLoggedIn() &&
-    currentPage === 'index.html'
-  ) {
-
-    window.location.href =
-      'intro.html';
-
-  }
-
-
-  if (
-    protectedPages.includes(
-      currentPage
-    ) &&
-    !isLoggedIn()
-  ) {
-
-    window.location.href =
-      'index.html';
-
-  }
-
-}
-
-
-// ========================================
-// الوضع الليلي والنهاري
-// ========================================
-
-function setTheme(theme) {
-
-  document.body.classList.toggle(
-    'light-theme',
-    theme === 'light'
-  );
-
-
-  localStorage.setItem(
-    'clan_theme',
-    theme
-  );
-
-
-  const button =
+  const themeToggle =
     document.getElementById(
-      'themeToggle'
+      "themeToggle"
     );
 
 
-  if (button) {
+  // جلب الوضع المحفوظ
 
-    button.textContent =
-      theme === 'light'
-        ? 'الوضع الليلي'
-        : 'الوضع النهاري';
+  const savedTheme =
+    localStorage.getItem(
+      THEME_KEY
+    );
+
+
+  // تشغيل الوضع الفاتح
+
+  if (
+    savedTheme === "light"
+  ) {
+
+    document.body.classList.add(
+      "light-theme"
+    );
 
   }
+
+
+  // إذا لم يوجد الزر
+
+  if (!themeToggle) return;
+
+
+  // عند الضغط
+
+  themeToggle.addEventListener(
+    "click",
+    function() {
+
+      // تبديل الوضع
+
+      document.body.classList.toggle(
+        "light-theme"
+      );
+
+
+      // معرفة الوضع الحالي
+
+      const isLight =
+        document.body.classList.contains(
+          "light-theme"
+        );
+
+
+      // حفظ الوضع
+
+      localStorage.setItem(
+        THEME_KEY,
+        isLight
+          ? "light"
+          : "dark"
+      );
+
+    }
+  );
 
 }
 
@@ -1263,66 +1067,76 @@ function setTheme(theme) {
 // تغيير اللغة
 // ========================================
 
-function setLanguage(lang) {
+function setupLanguage() {
 
-  localStorage.setItem(
-    'clan_lang',
-    lang
-  );
-
-
-  document.documentElement.lang =
-    lang;
+  const langToggle =
+    document.getElementById(
+      "langToggle"
+    );
 
 
-  document.documentElement.dir =
-    lang === 'en'
-      ? 'ltr'
-      : 'rtl';
+  // إذا لم يوجد الزر
+
+  if (!langToggle) return;
 
 
-  document
-    .querySelectorAll(
-      '[data-i18n]'
-    )
-    .forEach(
-      (node) => {
+  // عند الضغط
 
-        const key =
-          node.dataset.i18n;
+  langToggle.addEventListener(
+    "click",
+    function() {
 
+      // اللغة الحالية
 
-        const value =
-          translations[
-            lang
-          ][key];
+      const currentLang =
+        document.documentElement.lang;
 
 
-        if (value) {
+      // التحويل إلى الإنجليزية
 
-          node.textContent =
-            value;
+      if (
+        currentLang === "ar"
+      ) {
 
-        }
+        document.documentElement.lang =
+          "en";
+
+        document.documentElement.dir =
+          "ltr";
+
+        langToggle.textContent =
+          "AR";
+
+        localStorage.setItem(
+          LANG_KEY,
+          "en"
+        );
 
       }
-    );
 
 
-  const toggle =
-    document.getElementById(
-      'langToggle'
-    );
+      // التحويل إلى العربية
 
+      else {
 
-  if (toggle) {
+        document.documentElement.lang =
+          "ar";
 
-    toggle.textContent =
-      lang === 'en'
-        ? 'AR'
-        : 'EN';
+        document.documentElement.dir =
+          "rtl";
 
-  }
+        langToggle.textContent =
+          "EN";
+
+        localStorage.setItem(
+          LANG_KEY,
+          "ar"
+        );
+
+      }
+
+    }
+  );
 
 }
 
@@ -1332,137 +1146,37 @@ function setLanguage(lang) {
 // ========================================
 
 document.addEventListener(
-  'DOMContentLoaded',
-  () => {
+  "DOMContentLoaded",
+  function() {
 
-    enforceLogin();
-
-    bindLoginForm();
+    // تشغيل نموذج الرسائل
 
     bindContactForm();
 
-    bindCompetitionSelector();
+
+    // عرض الرسائل
+
+    renderContactMessages();
+
+
+    // تشغيل نموذج الحسابات
 
     bindMarketForm();
 
-    renderAccountCards();
 
-    renderContactMessages();
+    // عرض الحسابات
 
     renderMarketCards();
 
 
-    const savedTheme =
-      localStorage.getItem(
-        'clan_theme'
-      ) || 'dark';
+    // تشغيل الوضع الليلي
+
+    setupTheme();
 
 
-    const savedLang =
-      localStorage.getItem(
-        'clan_lang'
-      ) || 'ar';
+    // تشغيل اللغة
 
-
-    setTheme(
-      savedTheme
-    );
-
-
-    setLanguage(
-      savedLang
-    );
-
-
-    // زر الوضع الليلي
-
-    const themeButton =
-      document.getElementById(
-        'themeToggle'
-      );
-
-
-    if (themeButton) {
-
-      themeButton.addEventListener(
-        'click',
-        () => {
-
-          const nextTheme =
-            document.body
-              .classList
-              .contains(
-                'light-theme'
-              )
-              ? 'dark'
-              : 'light';
-
-
-          setTheme(
-            nextTheme
-          );
-
-        }
-      );
-
-    }
-
-
-    // زر اللغة
-
-    const langButton =
-      document.getElementById(
-        'langToggle'
-      );
-
-
-    if (langButton) {
-
-      langButton.addEventListener(
-        'click',
-        () => {
-
-          const currentLang =
-            localStorage.getItem(
-              'clan_lang'
-            ) || 'ar';
-
-
-          const nextLang =
-            currentLang === 'ar'
-              ? 'en'
-              : 'ar';
-
-
-          setLanguage(
-            nextLang
-          );
-
-        }
-      );
-
-    }
-
-
-    // عرض اسم المستخدم
-
-    const usernameDisplay =
-      document.getElementById(
-        'usernameDisplay'
-      );
-
-
-    if (usernameDisplay) {
-
-      const stored =
-        getStoredData();
-
-
-      usernameDisplay.textContent =
-        stored.username ||
-        'العضو';
-
-    }
+    setupLanguage();
 
   }
 );
