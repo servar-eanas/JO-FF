@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>JO FF Clan | لوحة الإدارة</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <style>
+
+    /* =========================================
+       الصفحة
+    ========================================= */
+
+    .admin-page {
+      padding: 40px 0 80px;
+    }
+
+
+    /* =========================================
+       رأس الصفحة
+    ========================================= */
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+
+    .admin-user {
+      padding: 12px 18px;
+      border-radius: 14px;
+      background: rgba(123, 223, 242, 0.1);
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+
+    /* =========================================
+       الشبكة
+    ========================================= */
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 20px;
+
+      margin-bottom: 20px;
+    }
+
+
+    /* =========================================
+       الأقسام
+    ========================================= */
+
+    .admin-section {
+      padding: 25px;
+      border-radius: 20px;
+
+      background:
+        rgba(255, 255, 255, 0.04);
+
+      border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+      margin-bottom: 20px;
+    }
+
+
+    .admin-section h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+
+    /* =========================================
+       الإشعار
+    ========================================= */
+
+    .admin-notice {
+      margin-bottom: 20px;
+
+      padding: 16px;
+
+      border-radius: 14px;
+
+      background:
+        rgba(137, 247, 169, 0.08);
+
+      border:
+        1px solid rgba(137, 247, 169, 0.2);
+
+      color: var(--success);
+    }
+
+
+    /* =========================================
+       الإحصائيات
+    ========================================= */
+
+    .stats-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 12px;
+    }
+
+
+    .admin-stat {
+      padding: 20px;
+
+      border-radius: 15px;
+
+      background:
+        rgba(255, 255, 255, 0.05);
+
+      text-align: center;
+    }
+
+
+    .admin-stat strong {
+      display: block;
+
+      font-size: 2rem;
+
+      color: var(--accent);
+
+      margin-bottom: 5px;
+    }
+
+
+    /* =========================================
+       أزرار الإدارة
+    ========================================= */
+
+    .admin-actions {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 10px;
+    }
+
+
+    .danger-btn {
+      background:
+        linear-gradient(
+          135deg,
+          #ff5f6d,
+          #d63031
+        );
+
+      color: white;
+    }
+
+
+    /* =========================================
+       نموذج إضافة عضو
+    ========================================= */
+
+    #memberForm {
+      display: grid;
+
+      gap: 12px;
+    }
+
+
+    #memberForm label {
+      font-weight: 700;
+
+      margin-top: 5px;
+    }
+
+
+    #memberForm .input {
+      width: 100%;
+
+      box-sizing: border-box;
+    }
+
+
+    #memberForm button {
+      margin-top: 10px;
+
+      cursor: pointer;
+    }
+
+
+    #memberForm button:disabled {
+      opacity: 0.6;
+
+      cursor: not-allowed;
+    }
+
+
+    /* =========================================
+       رسالة الحالة
+    ========================================= */
+
+    #memberStatusMessage {
+      margin-top: 18px;
+
+      padding: 12px;
+
+      border-radius: 12px;
+
+      font-weight: 700;
+
+      min-height: 20px;
+    }
+
+
+    /* =========================================
+       قائمة الأعضاء
+    ========================================= */
+
+    .members-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 18px;
+    }
+
+
+    .member-card {
+      padding: 20px;
+
+      border-radius: 18px;
+
+      background:
+        rgba(255, 255, 255, 0.04);
+
+      border:
+        1px solid rgba(255, 255, 255, 0.08);
+
+      transition:
+        transform 0.3s ease,
+        border-color 0.3s ease;
+    }
+
+
+    .member-card:hover {
+      transform: translateY(-5px);
+
+      border-color:
+        rgba(123, 223, 242, 0.4);
+    }
+
+
+    .member-card img {
+      width: 100%;
+
+      height: 180px;
+
+      object-fit: cover;
+
+      border-radius: 14px;
+
+      margin-bottom: 15px;
+    }
+
+
+    .member-card h3 {
+      margin-top: 0;
+    }
+
+
+    .member-card p {
+      margin: 9px 0;
+    }
+
+
+    .member-card .delete-member {
+      width: 100%;
+
+      margin-top: 15px;
+    }
+
+
+    /* =========================================
+       التحميل
+    ========================================= */
+
+    .loading-message {
+      text-align: center;
+
+      padding: 25px;
+
+      opacity: 0.7;
+    }
+
+
+    /* =========================================
+       Responsive
+    ========================================= */
+
+    @media (max-width: 1000px) {
+
+      .members-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
+
+    @media (max-width: 900px) {
+
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+
+      .admin-header {
+        flex-direction: column;
+
+        align-items: stretch;
+      }
+
+
+      .stats-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      .members-grid {
+        grid-template-columns: 1fr;
+      }
+
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================
+     شريط التنقل
+========================================= -->
+
+<header class="topbar">
+
+  <div class="container navbar">
+
+
+    <div class="brand">
+
+      <div class="brand-badge">
+        🔐
+      </div>
+
+      <span>
+        JO FF Clan
+      </span>
+
+    </div>
+
+
+    <nav class="nav-links">
+
+      <a href="intro.html">
+
+        <span class="nav-icon">
+          🏠
+        </span>
+
+        <span>
+          المقدمة
+        </span>
+
+      </a>
+
+
+      <a href="clan.html">
+
+        <span class="nav-icon">
+          👥
+        </span>
+
+        <span>
+          عن الكلان
+        </span>
+
+      </a>
+
+
+      <a href="competitions.html">
+
+        <span class="nav-icon">
+          🏆
+        </span>
+
+        <span>
+          المسابقات
+        </span>
+
+      </a>
+
+
+      <a href="contact.html">
+
+        <span class="nav-icon">
+          💬
+        </span>
+
+        <span>
+          التواصل
+        </span>
+
+      </a>
+
+
+      <a href="accounts.html">
+
+        <span class="nav-icon">
+          📦
+        </span>
+
+        <span>
+          الحسابات
+        </span>
+
+      </a>
+
+
+      <a href="links.html">
+
+        <span class="nav-icon">
+          🔗
+        </span>
+
+        <span>
+          الروابط
+        </span>
+
+      </a>
+
+    </nav>
+
+
+    <div class="control-group">
+
+      <button
+        id="themeToggle"
+        class="btn secondary small"
+        type="button"
+      >
+        الوضع الليلي
+      </button>
+
+
+      <button
+        id="langToggle"
+        class="btn secondary small"
+        type="button"
+      >
+        EN
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+
+<!-- =========================================
+     المحتوى الرئيسي
+========================================= -->
+
+<main class="container admin-page">
+
+
+  <!-- =========================================
+       رأس لوحة الإدارة
+  ========================================= -->
+
+  <div class="admin-header">
+
+
+    <div>
+
+      <span class="pill">
+        🔐 لوحة سرية
+      </span>
+
+
+      <h1>
+        لوحة الإدارة
+      </h1>
+
+
+      <p class="muted">
+        يمكنك من هنا إدارة محتوى موقع JO FF Clan.
+      </p>
+
+    </div>
+
+
+    <div class="admin-user">
+
+      المستخدم الإداري:
+
+      <span id="adminUsername">
+        جاري التحميل...
+      </span>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================================
+       إشعار الإدارة
+  ========================================= -->
+
+  <div class="admin-notice">
+
+    تم تسجيل دخولك بصلاحيات الإدارة.
+
+    هذه الصفحة متاحة فقط للحسابات الإدارية المصرح لها.
+
+  </div>
+
+
+
+  <!-- =========================================
+       الإحصائيات
+  ========================================= -->
+
+  <section class="admin-section">
+
+    <h3>
+      📊 إحصائيات الموقع
+    </h3>
+
+
+    <div class="stats-grid">
+
+
+      <div class="admin-stat">
+
+        <strong id="usersCount">
+          0
+        </strong>
+
+        <span>
+          المستخدمون
+        </span>
+
+      </div>
+
+
+      <div class="admin-stat">
+
+        <strong id="messagesCount">
+          0
+        </strong>
+
+        <span>
+          الرسائل
+        </span>
+
+      </div>
+
+
+      <div class="admin-stat">
+
+        <strong id="accountsCount">
+          0
+        </strong>
+
+        <span>
+          الحسابات
+        </span>
+
+      </div>
+
+
+      <div class="admin-stat">
+
+        <strong id="membersCount">
+          0
+        </strong>
+
+        <span>
+          أعضاء الكلان
+        </span>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       إدارة الموقع
+  ========================================= -->
+
+  <section class="admin-section">
+
+    <h3>
+      ⚙️ إدارة الموقع
+    </h3>
+
+
+    <div class="admin-actions">
+
+
+      <a
+        href="contact.html"
+        class="btn"
+      >
+        💬 إدارة الرسائل
+      </a>
+
+
+      <a
+        href="accounts.html"
+        class="btn"
+      >
+        📦 إدارة الحسابات
+      </a>
+
+
+      <a
+        href="competitions.html"
+        class="btn"
+      >
+        🏆 إدارة المسابقات
+      </a>
+
+
+      <a
+        href="links.html"
+        class="btn"
+      >
+        🔗 إدارة الروابط
+      </a>
+
+
+      <a
+        href="PLAYER.html"
+        class="btn"
+      >
+        👥 صفحة اللاعبين
+      </a>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       المستخدم الحالي
+  ========================================= -->
+
+  <section class="admin-grid">
+
+
+    <div class="admin-section">
+
+      <h3>
+        👤 المستخدم الحالي
+      </h3>
+
+
+      <p>
+
+        اسم المستخدم:
+
+        <strong id="currentUserName">
+          جاري التحميل...
+        </strong>
+
+      </p>
+
+
+      <p>
+
+        نوع الحساب:
+
+        <strong>
+          مدير
+        </strong>
+
+      </p>
+
+
+      <button
+        id="logoutBtn"
+        class="btn danger-btn"
+        type="button"
+      >
+        تسجيل الخروج
+      </button>
+
+
+    </div>
+
+
+
+    <!-- =========================================
+         أدوات الإدارة
+    ========================================= -->
+
+    <div class="admin-section">
+
+      <h3>
+        🛠️ أدوات الإدارة
+      </h3>
+
+
+      <div class="admin-actions">
+
+
+        <button
+          id="clearMessagesBtn"
+          class="btn danger-btn"
+          type="button"
+        >
+          حذف جميع الرسائل
+        </button>
+
+
+        <button
+          id="clearAccountsBtn"
+          class="btn danger-btn"
+          type="button"
+        >
+          حذف جميع الحسابات
+        </button>
+
+
+      </div>
+
+    </div>
+
+
+  </section>
+
+
+
+  <!-- =========================================
+       إضافة عضو
+  ========================================= -->
+
+  <section class="admin-section">
+
+
+    <h3>
+      👥 إضافة عضو جديد إلى الكلان
+    </h3>
+
+
+    <form id="memberForm">
+
+
+      <label for="memberName">
+        اسم العضو
+      </label>
+
+
+      <input
+        type="text"
+        id="memberName"
+        class="input"
+        placeholder="مثال: معتز"
+        required
+      >
+
+
+      <label for="memberUsername">
+        اسم اللاعب داخل اللعبة
+      </label>
+
+
+      <input
+        type="text"
+        id="memberUsername"
+        class="input"
+        placeholder="مثال: x2t_3"
+        required
+      >
+
+
+      <label for="memberRole">
+        الرتبة
+      </label>
+
+
+      <input
+        type="text"
+        id="memberRole"
+        class="input"
+        placeholder="مثال: قائد"
+        required
+      >
+
+
+      <label for="memberLevel">
+        المستوى
+      </label>
+
+
+      <input
+        type="text"
+        id="memberLevel"
+        class="input"
+        placeholder="مثال: محترف"
+        required
+      >
+
+
+      <label for="memberStatus">
+        الحالة
+      </label>
+
+
+      <select
+        id="memberStatus"
+        class="input"
+      >
+
+        <option value="نشط">
+          🟢 نشط
+        </option>
+
+        <option value="غير نشط">
+          🔴 غير نشط
+        </option>
+
+        <option value="متوقف">
+          🟡 متوقف
+        </option>
+
+      </select>
+
+
+      <label for="memberImage">
+        رابط صورة العضو
+      </label>
+
+
+      <input
+        type="url"
+        id="memberImage"
+        class="input"
+        placeholder="https://example.com/image.jpg"
+      >
+
+
+      <button
+        id="addMemberBtn"
+        type="submit"
+        class="btn"
+      >
+
+        ➕ إضافة العضو
+
+      </button>
+
+
+    </form>
+
+
+    <p id="memberStatusMessage"></p>
+
+
+  </section>
+
+
+
+  <!-- =========================================
+       قائمة أعضاء الكلان
+  ========================================= -->
+
+  <section class="admin-section">
+
+
+    <h3>
+      📋 أعضاء الكلان المحفوظون
+    </h3>
+
+
+    <div
+      id="adminMembersList"
+      class="members-grid"
+    >
+
+      <p class="loading-message">
+        جاري تحميل الأعضاء...
+      </p>
+
+    </div>
+
+
+  </section>
+
+
+</main>
+
+
+
+<!-- =========================================
+     ملف الموقع الأساسي
+========================================= -->
+
+<script src="script.js"></script>
+
+
+
+<!-- =========================================
+     Firebase + Firestore
+========================================= -->
+
+<script type="module">
+
+import {
+
+  db,
+
+  collection,
+
+  addDoc,
+
+  getDocs,
+
+  deleteDoc,
+
+  doc,
+
+  serverTimestamp
+
+} from "./firebase-config.js";
+
+
+
+/* =========================================
+   المستخدم الحالي
+========================================= */
+
+const currentUser =
+
+  localStorage.getItem("currentUser") ||
+
+  localStorage.getItem("loggedInUser");
+
+
+
+/* =========================================
+   المديرين المسموح لهم
+========================================= */
+
+const adminUsers = [
+
+  "x2t_3",
+
+  "_7ep6"
+
+];
+
+
+
+/* =========================================
+   حماية لوحة الإدارة
+========================================= */
+
+if (
+
+  !currentUser ||
+
+  !adminUsers.includes(currentUser)
+
+) {
+
+  alert(
+    "ليس لديك صلاحية لدخول لوحة الإدارة."
+  );
+
+  window.location.href =
+    "intro.html";
+
+  throw new Error(
+    "Unauthorized admin access"
+  );
+
+}
+
+
+
+/* =========================================
+   عرض اسم المدير
+========================================= */
+
+const adminUsername =
+
+  document.getElementById(
+    "adminUsername"
+  );
+
+
+const currentUserName =
+
+  document.getElementById(
+    "currentUserName"
+  );
+
+
+if (adminUsername) {
+
+  adminUsername.textContent =
+    currentUser;
+
+}
+
+
+if (currentUserName) {
+
+  currentUserName.textContent =
+    currentUser;
+
+}
+
+
+
+/* =========================================
+   عناصر الصفحة
+========================================= */
+
+const memberForm =
+
+  document.getElementById(
+    "memberForm"
+  );
+
+
+const memberStatusMessage =
+
+  document.getElementById(
+    "memberStatusMessage"
+  );
+
+
+const adminMembersList =
+
+  document.getElementById(
+    "adminMembersList"
+  );
+
+
+const membersCount =
+
+  document.getElementById(
+    "membersCount"
+  );
+
+
+const addMemberBtn =
+
+  document.getElementById(
+    "addMemberBtn"
+  );
+
+
+
+/* =========================================
+   رسالة الحالة
+========================================= */
+
+function showMemberMessage(
+
+  message,
+
+  type = "success"
+
+) {
+
+  memberStatusMessage.textContent =
+    message;
+
+
+  if (type === "error") {
+
+    memberStatusMessage.style.background =
+      "rgba(255, 95, 109, 0.12)";
+
+    memberStatusMessage.style.color =
+      "#ff5f6d";
+
+  }
+
+  else {
+
+    memberStatusMessage.style.background =
+      "rgba(137, 247, 169, 0.10)";
+
+    memberStatusMessage.style.color =
+      "#89f7a9";
+
+  }
+
+}
+
+
+
+/* =========================================
+   إضافة عضو جديد
+========================================= */
+
+memberForm.addEventListener(
+
+  "submit",
+
+  async function(event) {
+
+
+    event.preventDefault();
+
+
+    /* ---------------------------------------
+       قراءة البيانات
+    --------------------------------------- */
+
+    const name =
+
+      document
+        .getElementById("memberName")
+        .value
+        .trim();
+
+
+    const username =
+
+      document
+        .getElementById("memberUsername")
+        .value
+        .trim();
+
+
+    const role =
+
+      document
+        .getElementById("memberRole")
+        .value
+        .trim();
+
+
+    const level =
+
+      document
+        .getElementById("memberLevel")
+        .value
+        .trim();
+
+
+    const status =
+
+      document
+        .getElementById("memberStatus")
+        .value;
+
+
+    const image =
+
+      document
+        .getElementById("memberImage")
+        .value
+        .trim();
+
+
+
+    /* ---------------------------------------
+       التحقق من البيانات
+    --------------------------------------- */
+
+    if (
+
+      !name ||
+
+      !username ||
+
+      !role ||
+
+      !level
+
+    ) {
+
+      showMemberMessage(
+
+        "يرجى تعبئة جميع البيانات المطلوبة.",
+
+        "error"
+
+      );
+
+      return;
+
+    }
+
+
+
+    /* ---------------------------------------
+       تعطيل الزر
+    --------------------------------------- */
+
+    addMemberBtn.disabled =
+      true;
+
+
+    addMemberBtn.textContent =
+      "جاري الحفظ...";
+
+
+    showMemberMessage(
+
+      "جاري حفظ العضو في Firebase..."
+
+    );
+
+
+
+    try {
+
+
+      /* ---------------------------------------
+         حفظ العضو في Firestore
+      --------------------------------------- */
+
+      const memberData = {
+
+        name: name,
+
+        username: username,
+
+        role: role,
+
+        level: level,
+
+        status: status,
+
+        image: image,
+
+        addedBy: currentUser,
+
+        createdAt:
+          serverTimestamp()
+
+      };
+
+
+      const newMember =
+
+        await addDoc(
+
+          collection(
+            db,
+            "members"
+          ),
+
+          memberData
+
+        );
+
+
+
+      console.log(
+
+        "تم حفظ العضو:",
+
+        newMember.id
+
+      );
+
+
+
+      /* ---------------------------------------
+         نجاح
+      --------------------------------------- */
+
+      showMemberMessage(
+
+        "تمت إضافة العضو وحفظه في Firebase بنجاح ✅"
+
+      );
+
+
+
+      /* ---------------------------------------
+         تفريغ النموذج
+      --------------------------------------- */
+
+      memberForm.reset();
+
+
+
+      /* ---------------------------------------
+         تحديث القائمة
+      --------------------------------------- */
+
+      await loadAdminMembers();
+
+
+    }
+
+    catch(error) {
+
+
+      console.error(
+
+        "Firebase Error:",
+
+        error
+
+      );
+
+
+      showMemberMessage(
+
+        "فشل حفظ العضو: " +
+
+        error.message,
+
+        "error"
+
+      );
+
+
+    }
+
+    finally {
+
+
+      addMemberBtn.disabled =
+        false;
+
+
+      addMemberBtn.textContent =
+        "➕ إضافة العضو";
+
+
+    }
+
+  }
+
+);
+
+
+
+/* =========================================
+   تحميل أعضاء الكلان
+========================================= */
+
+async function loadAdminMembers() {
+
+
+  adminMembersList.innerHTML =
+
+    `
+
+      <p class="loading-message">
+
+        جاري تحميل الأعضاء...
+
+      </p>
+
+    `;
+
+
+
+  try {
+
+
+    const snapshot =
+
+      await getDocs(
+
+        collection(
+          db,
+          "members"
+        )
+
+      );
+
+
+
+    /* ---------------------------------------
+       تحديث العدد
+    --------------------------------------- */
+
+    membersCount.textContent =
+
+      snapshot.size;
+
+
+
+    /* ---------------------------------------
+       تفريغ القائمة
+    --------------------------------------- */
+
+    adminMembersList.innerHTML =
+      "";
+
+
+
+    /* ---------------------------------------
+       لا يوجد أعضاء
+    --------------------------------------- */
+
+    if (
+
+      snapshot.empty
+
+    ) {
+
+
+      adminMembersList.innerHTML =
+
+        `
+
+          <p>
+
+            لا يوجد أعضاء حاليا.
+
+          </p>
+
+        `;
+
+
+      return;
+
+    }
+
+
+
+    /* ---------------------------------------
+       عرض الأعضاء
+    --------------------------------------- */
+
+    snapshot.forEach(
+
+      function(memberDoc) {
+
+
+        const member =
+
+          memberDoc.data();
+
+
+
+        const card =
+
+          document.createElement(
+            "div"
+          );
+
+
+        card.className =
+          "member-card";
+
+
+
+        /* -------------------------------------
+           صورة العضو
+        ------------------------------------- */
+
+        if (
+
+          member.image
+
+        ) {
+
+
+          const image =
+
+            document.createElement(
+              "img"
+            );
+
+
+          image.src =
+            member.image;
+
+
+          image.alt =
+            member.name || "صورة العضو";
+
+
+          image.onerror =
+
+            function() {
+
+              this.style.display =
+                "none";
+
+            };
+
+
+          card.appendChild(
+            image
+          );
+
+        }
+
+
+
+        /* -------------------------------------
+           الاسم
+        ------------------------------------- */
+
+        const title =
+
+          document.createElement(
+            "h3"
+          );
+
+
+        title.textContent =
+
+          "👤 " +
+
+          (member.name || "");
+
+
+        card.appendChild(
+          title
+        );
+
+
+
+        /* -------------------------------------
+           المعلومات
+        ------------------------------------- */
+
+        const username =
+
+          document.createElement(
+            "p"
+          );
+
+
+        username.textContent =
+
+          "🎮 اسم اللاعب: " +
+
+          (member.username || "");
+
+
+        card.appendChild(
+          username
+        );
+
+
+
+        const role =
+
+          document.createElement(
+            "p"
+          );
+
+
+        role.textContent =
+
+          "🏅 الرتبة: " +
+
+          (member.role || "");
+
+
+        card.appendChild(
+          role
+        );
+
+
+
+        const level =
+
+          document.createElement(
+            "p"
+          );
+
+
+        level.textContent =
+
+          "⭐ المستوى: " +
+
+          (member.level || "");
+
+
+        card.appendChild(
+          level
+        );
+
+
+
+        const status =
+
+          document.createElement(
+            "p"
+          );
+
+
+        status.textContent =
+
+          "🟢 الحالة: " +
+
+          (member.status || "");
+
+
+        card.appendChild(
+          status
+        );
+
+
+
+        /* -------------------------------------
+           زر الحذف
+        ------------------------------------- */
+
+        const deleteButton =
+
+          document.createElement(
+            "button"
+          );
+
+
+        deleteButton.className =
+
+          "btn danger-btn delete-member";
+
+
+        deleteButton.type =
+          "button";
+
+
+        deleteButton.textContent =
+
+          "🗑️ حذف العضو";
+
+
+        deleteButton.dataset.id =
+
+          memberDoc.id;
+
+
+
+        deleteButton.addEventListener(
+
+          "click",
+
+          deleteMember
+
+        );
+
+
+
+        card.appendChild(
+
+          deleteButton
+
+        );
+
+
+
+        /* -------------------------------------
+           إضافة البطاقة للقائمة
+        ------------------------------------- */
+
+        adminMembersList.appendChild(
+
+          card
+
+        );
+
+
+      }
+
+    );
+
+
+  }
+
+  catch(error) {
+
+
+    console.error(
+
+      "Firebase Load Error:",
+
+      error
+
+    );
+
+
+    adminMembersList.innerHTML =
+
+      `
+
+        <p style="color:#ff5f6d;">
+
+          ❌ حدث خطأ أثناء تحميل الأعضاء.
+
+          <br><br>
+
+          ${escapeHTML(
+            error.message
+          )}
+
+        </p>
+
+      `;
+
+  }
+
+}
+
+
+
+/* =========================================
+   حذف عضو
+========================================= */
+
+async function deleteMember(event) {
+
+
+  const memberId =
+
+    event.currentTarget.dataset.id;
+
+
+
+  const confirmed =
+
+    confirm(
+
+      "هل أنت متأكد من حذف هذا العضو؟"
+
+    );
+
+
+
+  if (!confirmed) {
+
+    return;
+
+  }
+
+
+
+  try {
+
+
+    await deleteDoc(
+
+      doc(
+
+        db,
+
+        "members",
+
+        memberId
+
+      )
+
+    );
+
+
+
+    showMemberMessage(
+
+      "تم حذف العضو بنجاح."
+
+    );
+
+
+
+    await loadAdminMembers();
+
+
+  }
+
+  catch(error) {
+
+
+    console.error(
+
+      "Firebase Delete Error:",
+
+      error
+
+    );
+
+
+    showMemberMessage(
+
+      "فشل حذف العضو: " +
+
+      error.message,
+
+      "error"
+
+    );
+
+  }
+
+}
+
+
+
+/* =========================================
+   حماية النصوص
+========================================= */
+
+function escapeHTML(value) {
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+
+/* =========================================
+   تسجيل الخروج
+========================================= */
+
+const logoutBtn =
+
+  document.getElementById(
+    "logoutBtn"
+  );
+
+
+if (logoutBtn) {
+
+
+  logoutBtn.addEventListener(
+
+    "click",
+
+    function() {
+
+
+      localStorage.removeItem(
+        "currentUser"
+      );
+
+
+      localStorage.removeItem(
+        "loggedInUser"
+      );
+
+
+      window.location.href =
+        "login.html";
+
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================
+   حذف الرسائل من LocalStorage
+========================================= */
+
+const clearMessagesBtn =
+
+  document.getElementById(
+    "clearMessagesBtn"
+  );
+
+
+if (clearMessagesBtn) {
+
+
+  clearMessagesBtn.addEventListener(
+
+    "click",
+
+    function() {
+
+
+      const confirmed =
+
+        confirm(
+
+          "هل أنت متأكد من حذف جميع الرسائل؟"
+
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      localStorage.removeItem(
+
+        "contactMessages"
+
+      );
+
+
+      alert(
+
+        "تم حذف جميع الرسائل."
+
+      );
+
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================
+   حذف الحسابات من LocalStorage
+========================================= */
+
+const clearAccountsBtn =
+
+  document.getElementById(
+    "clearAccountsBtn"
+  );
+
+
+if (clearAccountsBtn) {
+
+
+  clearAccountsBtn.addEventListener(
+
+    "click",
+
+    function() {
+
+
+      const confirmed =
+
+        confirm(
+
+          "هل أنت متأكد من حذف جميع الحسابات؟"
+
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      localStorage.removeItem(
+
+        "marketAccounts"
+
+      );
+
+
+      alert(
+
+        "تم حذف جميع الحسابات."
+
+      );
+
+
+    }
+
+  );
+
+}
+
+
+
+/* =========================================
+   تحميل الأعضاء عند فتح الصفحة
+========================================= */
+
+loadAdminMembers();
+
+</script>
+
+
+</body>
+
+</html>

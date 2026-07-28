@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>JO FF Clan | اللاعبين</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="container navbar">
+
+    <div class="brand">
+
+      <div class="brand-badge">
+        🎮
+      </div>
+
+      <span>
+        JO FF Clan
+      </span>
+
+    </div>
+
+
+    <nav class="nav-links">
+
+      <a href="intro.html">
+        🏠 المقدمة
+      </a>
+
+      <a href="clan.html">
+        👥 عن الكلان
+      </a>
+
+      <a href="player.html" class="active">
+        🎮 اللاعبين
+      </a>
+
+      <a href="competitions.html">
+        🏆 المسابقات
+      </a>
+
+      <a href="contact.html">
+        💬 التواصل
+      </a>
+
+      <a href="accounts.html">
+        📦 الحسابات
+      </a>
+
+      <a href="links.html">
+        🔗 الروابط
+      </a>
+
+    </nav>
+
+
+    <div class="control-group">
+
+      <button
+        id="themeToggle"
+        class="btn secondary small"
+        type="button"
+      >
+        الوضع الليلي
+      </button>
+
+      <button
+        id="langToggle"
+        class="btn secondary small"
+        type="button"
+      >
+        EN
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="container hero">
+
+  <section class="panel">
+
+    <div class="section-head">
+
+      <div>
+
+        <h1>
+          🎮 لاعبو JO FF Clan
+        </h1>
+
+        <p class="muted">
+          قائمة اللاعبين المسجلين في الكلان
+        </p>
+
+      </div>
+
+      <span class="badge">
+        Players
+      </span>
+
+    </div>
+
+
+    <div
+      id="playersList"
+      class="grid-3"
+    >
+
+      <p>
+        جاري تحميل اللاعبين...
+      </p>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script src="script.js"></script>
+
+
+<script type="module">
+
+import {
+
+  db,
+
+  collection,
+
+  getDocs
+
+} from "./firebase-config.js";
+
+
+const playersList =
+  document.getElementById(
+    "playersList"
+  );
+
+
+async function loadPlayers() {
+
+  try {
+
+    const snapshot =
+      await getDocs(
+        collection(
+          db,
+          "members"
+        )
+      );
+
+
+    playersList.innerHTML = "";
+
+
+    if (snapshot.empty) {
+
+      playersList.innerHTML = `
+
+        <div class="panel">
+
+          <h3>
+            👥 لا يوجد لاعبين حاليا
+          </h3>
+
+          <p class="muted">
+            سيتم إضافة اللاعبين قريبا.
+          </p>
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    snapshot.forEach(
+      function(memberDoc) {
+
+        const player =
+          memberDoc.data();
+
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+
+        card.className =
+          "panel";
+
+
+        card.innerHTML = `
+
+          <div
+            style="
+              font-size: 3rem;
+              text-align: center;
+              margin-bottom: 15px;
+            "
+          >
+            🎮
+          </div>
+
+
+          <h2>
+            ${escapeHTML(
+              player.username ||
+              "لا يوجد اسم"
+            )}
+          </h2>
+
+
+          <p class="muted">
+            👤 اسم العضو:
+            ${escapeHTML(
+              player.name ||
+              "غير محدد"
+            )}
+          </p>
+
+
+          <p>
+            🏅 الرتبة:
+            ${escapeHTML(
+              player.role ||
+              "غير محدد"
+            )}
+          </p>
+
+
+          <p>
+            ⭐ المستوى:
+            ${escapeHTML(
+              player.level ||
+              "غير محدد"
+            )}
+          </p>
+
+
+          <span class="badge">
+
+            ${
+              player.status ||
+              "غير محدد"
+            }
+
+          </span>
+
+        `;
+
+
+        playersList.appendChild(
+          card
+        );
+
+      }
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Firebase Error:",
+      error
+    );
+
+
+    playersList.innerHTML = `
+
+      <div class="panel">
+
+        <h3>
+          ❌ حدث خطأ
+        </h3>
+
+        <p class="muted">
+          تعذر تحميل قائمة اللاعبين.
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+function escapeHTML(value) {
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+loadPlayers();
+
+</script>
+
+
+</body>
+
+</html>

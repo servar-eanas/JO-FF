@@ -13,14 +13,39 @@
         <div class="brand-badge">📦</div>
         <span>JO FF Clan</span>
       </div>
-      <nav class="nav-links">
-        <a href="intro.html" data-i18n="nav_intro">المقدمة</a>
-        <a href="clan.html" data-i18n="nav_clan">عن الكلان</a>
-        <a href="competitions.html" data-i18n="nav_competitions">المسابقات</a>
-        <a href="contact.html" data-i18n="nav_contact">التواصل</a>
-        <a class="active" href="accounts.html" data-i18n="nav_market">الحسابات</a>
-        <a href="links.html" data-i18n="nav_links">الروابط</a>
-      </nav>
+<nav class="nav-links">
+
+  <a href="intro.html" data-i18n="nav_intro">
+    <span class="nav-icon">🏠</span>
+    <span>المقدمة</span>
+  </a>
+
+  <a href="clan.html" data-i18n="nav_clan">
+    <span class="nav-icon">👥</span>
+    <span>عن الكلان</span>
+  </a>
+
+  <a href="competitions.html" data-i18n="nav_competitions">
+    <span class="nav-icon">🏆</span>
+    <span>المسابقات</span>
+  </a>
+
+  <a href="contact.html" data-i18n="nav_contact">
+    <span class="nav-icon">💬</span>
+    <span>التواصل</span>
+  </a>
+
+  <a href="accounts.html" data-i18n="nav_market">
+    <span class="nav-icon">📦</span>
+    <span>الحسابات</span>
+  </a>
+
+  <a href="links.html" data-i18n="nav_links">
+    <span class="nav-icon">🔗</span>
+    <span>الروابط</span>
+  </a>
+                     <tr><td>في حال الغش او عدم وصول الحساب المطلوب يرجى تواصل مع قائد الكلان</td></tr>
+</nav>
       <div class="control-group">
         <button id="themeToggle" class="btn secondary small" type="button">الوضع الليلي</button>
         <button id="langToggle" class="btn secondary small" type="button">EN</button>
@@ -36,16 +61,16 @@
 
         <div class="leader-links">
           <a href="#">Instagram: @joff_clan</a>
-          <a href="#">TikTok: @joff_tiktok</a>
-          <a href="#">القائد: @joff_leader</a>
-          <a href="#">بنيابة الزعيم: @joff_v1</a>
+          <a href="#">TikTok: @joff_clan</a>
+          <a href="#">القائد: @x2t_3</a>
+          <a href="#">قائد البنيابة : @_7ep6</a>
         </div>
 
         <div id="marketCards" class="market-grid"></div>
       </div>
 
       <div class="panel">
-        <h2 data-i18n="market_form">إضافة حساب جديد</h2>
+        <h2 data-i18n="market_form">إضافة حساب للبيع او طلب شراء</h2>
         <form id="marketForm">
           <div class="form-grid">
             <div>
@@ -58,6 +83,7 @@
                 <option value="نادر">نادر</option>
                 <option value="كلاسيكي">كلاسيكي</option>
                 <option value="احداث">احداث</option>
+                <option value="مهجور">مهجور </option>
                 <option value="مختلط">مختلط</option>
               </select>
             </div>
@@ -79,8 +105,18 @@
               <input id="accountPrice" class="input" type="number" placeholder="25" />
             </div>
             <div>
-              <label data-i18n="label_upload">رفع صورة من الجهاز</label>
-              <input id="accountImageFile" class="input" type="file" accept="image/*" />
+              <label data-i18n="label_upload">رفع صور/فيديو من الجهاز</label>
+              <input id="accountImageFile" class="input" type="file" accept="image/*,video/*" multiple />
+
+              <div id="uploadPreview" style="margin-top:8px;">
+                <div id="previewContainer" style="display:flex;align-items:center;gap:8px;">
+                  <button type="button" id="prevMedia" class="btn small secondary" style="display:none;">◀</button>
+                  <div id="previewArea" style="width:140px;height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:8px;background:#111;color:#fff;"></div>
+                  <button type="button" id="nextMedia" class="btn small" style="display:none;">▶</button>
+                </div>
+                <div id="previewIndicator" class="muted" style="margin-top:6px;font-size:12px;"></div>
+              </div>
+
             </div>
             <div class="full-span">
               <label data-i18n="label_specs">مواصفات الحساب</label>
@@ -95,7 +131,6 @@
       </div>
     </section>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>

@@ -1,545 +1,711 @@
-// ========================================
-// إعدادات التخزين
-// ========================================
-
-const CONTACT_KEY = "clan_contact_messages";
-const MARKET_KEY = "clan_market_accounts";
-const THEME_KEY = "clan_theme";
-const LANG_KEY = "clan_lang";
+// ==================================================
+// JO FF CLAN - SCRIPT.JS
+// نظام تسجيل الدخول + الإدارة + الرسائل + الحسابات
+// ==================================================
 
 
-// ========================================
-// حماية النصوص
-// ========================================
+// ==================================================
+// بيانات المستخدمين الإداريين
+// ==================================================
 
-function escapeHtml(text) {
-  return String(text || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+const ADMIN_USERS = {
+  "x2t_3": "mutaz12mutaz09123",
+  "_7ep6": "abood12abood09123"
+};
 
 
-// ========================================
-// ================= الرسائل ================
-// ========================================
+// ==================================================
+// تشغيل جميع وظائف الموقع عند تحميل الصفحة
+// ==================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  // تسجيل الدخول
+  setupLogin();
+
+  // حماية الصفحات
+  protectPages();
+
+  // حماية صفحة الإدارة
+  protectAdminPage();
+
+  // إظهار رابط لوحة الإدارة للمدراء فقط
+  addAdminLink();
+
+  // إظهار اسم المستخدم الحالي
+  showCurrentUser();
+
+  // تسجيل الخروج
+  setupLogout();
+
+  // سجل تسجيل الدخول
+  showLoginHistory();
+
+  // نظام الرسائل
+  setupContactForm();
+  showContactMessages();
+
+  // نظام الحسابات
+  setupMarketForm();
+  showMarketAccounts();
+
+  // معاينة الصور والفيديو
+  setupMediaPreview();
+
+  // الوضع الليلي
+  setupTheme();
+
+  // اللغة
+  setupLanguage();
+
+});
 
 
-// عرض الرسائل
+// ==================================================
+// تسجيل الدخول
+// ==================================================
 
-function renderContactMessages() {
+function setupLogin() {
 
-  const contactList =
-    document.getElementById("contactList");
+  const loginForm = document.getElementById("loginForm");
 
-  if (!contactList) return;
-
-
-  const messages =
-    JSON.parse(
-      localStorage.getItem(CONTACT_KEY) || "[]"
-    );
-
-
-  if (messages.length === 0) {
-
-    contactList.innerHTML = `
-      <div class="list-item">
-        لا توجد رسائل حتى الآن.
-      </div>
-    `;
-
+  // إذا لم تكن الصفحة تحتوي على نموذج تسجيل الدخول
+  if (!loginForm) {
     return;
   }
 
+  loginForm.addEventListener("submit", function (event) {
 
-  contactList.innerHTML =
-    messages.map((message, index) => {
+    event.preventDefault();
 
-      return `
+    const usernameElement =
+      document.getElementById("username");
 
-        <div
-          class="list-item"
-          id="message-${index}"
-          style="margin-bottom:12px;"
-        >
+    const passwordElement =
+      document.getElementById("password");
 
+    const statusElement =
+      document.getElementById("loginStatus");
 
-          <!-- عرض الرسالة -->
+    if (!usernameElement || !passwordElement) {
+      return;
+    }
 
-          <div id="message-view-${index}">
+    const username =
+      usernameElement.value.trim();
 
-            <strong>
-              ${escapeHtml(message.name)}
-            </strong>
+    const password =
+      passwordElement.value;
 
-            <br>
+    // التحقق من الحقول
+    if (username === "" || password === "") {
 
-            <span class="muted">
-              إلى:
-              ${escapeHtml(message.person)}
-            </span>
+      if (statusElement) {
 
+        statusElement.textContent =
+          "يرجى إدخال اسم المستخدم وكلمة المرور";
 
-            <p
-              style="
-                margin-top:10px;
-                white-space:pre-wrap;
-              "
-            >
-              ${escapeHtml(message.text)}
-            </p>
+        statusElement.className =
+          "status error";
 
+      }
 
-            ${
-              message.edited
-                ? `
-                  <small
-                    class="muted"
-                    style="display:block;margin-bottom:8px;"
-                  >
-                    تم تعديل الرسالة
-                  </small>
-                `
-                : ""
-            }
+      return;
+    }
 
 
-            <!-- أزرار الرسالة -->
+    // ==================================================
+    // التحقق من المستخدم الإداري
+    // ==================================================
 
-            <div
-              style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-                margin-top:10px;
-              "
-            >
-
-              <button
-                type="button"
-                class="btn secondary small"
-                onclick="editMessage(${index})"
-              >
-                تعديل الرسالة
-              </button>
+    const isAdmin =
+      Object.prototype.hasOwnProperty.call(
+        ADMIN_USERS,
+        username
+      ) &&
+      ADMIN_USERS[username] === password;
 
 
-              <button
-                type="button"
-                class="btn small"
-                onclick="deleteMessage(${index})"
-              >
-                حذف الرسالة
-              </button>
+    // ==================================================
+    // حفظ المستخدم الحالي
+    // ==================================================
 
-            </div>
+    localStorage.setItem(
+      "currentUser",
+      username
+    );
 
-          </div>
-
-
-          <!-- نموذج تعديل الرسالة -->
-
-          <div
-            id="message-edit-${index}"
-            style="display:none;"
-          >
-
-            <label>
-              تعديل الرسالة
-            </label>
-
-
-            <textarea
-              id="message-input-${index}"
-              class="input"
-              rows="5"
-              style="width:100%;margin-top:10px;"
-            >${escapeHtml(message.text)}</textarea>
-
-
-            <div
-              style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-                margin-top:10px;
-              "
-            >
-
-              <button
-                type="button"
-                class="btn small"
-                onclick="saveMessage(${index})"
-              >
-                حفظ التعديل
-              </button>
-
-
-              <button
-                type="button"
-                class="btn secondary small"
-                onclick="cancelEdit(${index})"
-              >
-                إلغاء
-              </button>
-
-            </div>
-
-
-            <div
-              id="edit-status-${index}"
-              class="status"
-            ></div>
-
-          </div>
-
-        </div>
-
-      `;
-
-    }).join("");
-
-}
-
-
-// فتح تعديل الرسالة
-
-function editMessage(index) {
-
-  const messageView =
-    document.getElementById(
-      `message-view-${index}`
+    localStorage.setItem(
+      "isAdmin",
+      isAdmin ? "true" : "false"
     );
 
 
-  const messageEdit =
-    document.getElementById(
-      `message-edit-${index}`
-    );
+    // ==================================================
+    // حفظ سجل تسجيل الدخول
+    // ==================================================
 
+    let loginHistory = [];
 
-  if (
-    !messageView ||
-    !messageEdit
-  ) {
-    return;
-  }
+    try {
 
+      loginHistory =
+        JSON.parse(
+          localStorage.getItem("loginHistory") || "[]"
+        );
 
-  messageView.style.display =
-    "none";
+      if (!Array.isArray(loginHistory)) {
+        loginHistory = [];
+      }
 
+    } catch (error) {
 
-  messageEdit.style.display =
-    "block";
-
-
-  const input =
-    document.getElementById(
-      `message-input-${index}`
-    );
-
-
-  if (input) {
-
-    input.focus();
-
-  }
-
-}
-
-
-// حفظ تعديل الرسالة
-
-function saveMessage(index) {
-
-  const input =
-    document.getElementById(
-      `message-input-${index}`
-    );
-
-
-  const status =
-    document.getElementById(
-      `edit-status-${index}`
-    );
-
-
-  if (!input) return;
-
-
-  const newText =
-    input.value.trim();
-
-
-  if (newText === "") {
-
-    if (status) {
-
-      status.className =
-        "status error";
-
-      status.textContent =
-        "لا يمكن أن تكون الرسالة فارغة.";
+      loginHistory = [];
 
     }
 
-    return;
-  }
+
+    loginHistory.push({
+
+      username: username,
+
+      time:
+        new Date().toLocaleString("ar-JO"),
+
+      isAdmin:
+        isAdmin
+
+    });
 
 
-  const messages =
-    JSON.parse(
-      localStorage.getItem(
-        CONTACT_KEY
-      ) || "[]"
+    localStorage.setItem(
+      "loginHistory",
+      JSON.stringify(loginHistory)
     );
 
 
-  if (!messages[index]) {
+    // ==================================================
+    // رسالة نجاح
+    // ==================================================
 
-    return;
+    if (statusElement) {
 
-  }
+      statusElement.textContent =
+        "تم تسجيل الدخول بنجاح";
 
+      statusElement.className =
+        "status";
 
-  messages[index].text =
-    newText;
-
-
-  messages[index].edited =
-    true;
-
-
-  messages[index].editedAt =
-    new Date().toISOString();
+    }
 
 
-  localStorage.setItem(
-    CONTACT_KEY,
-    JSON.stringify(messages)
-  );
+    // ==================================================
+    // الانتقال إلى الصفحة الرئيسية
+    // ==================================================
 
+    setTimeout(function () {
 
-  renderContactMessages();
+      window.location.href =
+        "intro.html";
+
+    }, 500);
+
+  });
 
 }
 
 
-// إلغاء تعديل الرسالة
+// ==================================================
+// حماية الصفحات
+// ==================================================
 
-function cancelEdit(index) {
+function protectPages() {
 
-  const messageView =
-    document.getElementById(
-      `message-view-${index}`
-    );
-
-
-  const messageEdit =
-    document.getElementById(
-      `message-edit-${index}`
-    );
+  const currentPage =
+    window.location.pathname
+      .split("/")
+      .pop();
 
 
-  if (
-    !messageView ||
-    !messageEdit
-  ) {
+  // إذا كان اسم الصفحة فارغا
+  // يعتبر صفحة عامة
+  const publicPages = [
+
+    "login.html",
+
+    ""
+
+  ];
+
+
+  // السماح لصفحة تسجيل الدخول
+  if (publicPages.includes(currentPage)) {
+
     return;
+
   }
 
 
-  messageEdit.style.display =
-    "none";
+  // الحصول على المستخدم الحالي
+  const currentUser =
+    localStorage.getItem("currentUser");
 
 
-  messageView.style.display =
-    "block";
+  // إذا لم يكن هناك مستخدم مسجل
+  if (!currentUser) {
+
+    window.location.href =
+      "login.html";
+
+  }
 
 }
 
 
-// حذف الرسالة
+// ==================================================
+// حماية لوحة الإدارة
+// ==================================================
 
-function deleteMessage(index) {
+function protectAdminPage() {
 
-  const confirmDelete =
-    confirm(
-      "هل أنت متأكد أنك تريد حذف هذه الرسالة؟"
-    );
+  const currentPage =
+    window.location.pathname
+      .split("/")
+      .pop();
 
 
-  if (!confirmDelete) {
+  // إذا لم تكن صفحة الإدارة
+  if (currentPage !== "admin.html") {
 
     return;
 
   }
 
 
-  const messages =
-    JSON.parse(
-      localStorage.getItem(
-        CONTACT_KEY
-      ) || "[]"
-    );
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+  const isAdmin =
+    localStorage.getItem("isAdmin");
 
 
-  if (!messages[index]) {
+  // التحقق من أن المستخدم من المدراء المسموح لهم
+  const allowedAdmin =
+
+    currentUser &&
+
+    Object.prototype.hasOwnProperty.call(
+      ADMIN_USERS,
+      currentUser
+    ) &&
+
+    isAdmin === "true";
+
+
+  // إذا لم يكن لديه صلاحية
+  if (!allowedAdmin) {
 
     alert(
-      "لم يتم العثور على الرسالة."
+      "ليس لديك صلاحية لدخول لوحة الإدارة."
     );
+
+    window.location.href =
+      "intro.html";
+
+  }
+
+}
+
+
+// ==================================================
+// إظهار رابط لوحة الإدارة للمدراء فقط
+// ==================================================
+
+function addAdminLink() {
+
+  const adminLinks =
+    document.querySelectorAll(
+      "#adminLink, #adminPanelLink"
+    );
+
+
+  if (!adminLinks.length) {
 
     return;
 
   }
 
 
-  messages.splice(
-    index,
-    1
-  );
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+  const isAdmin =
+    localStorage.getItem("isAdmin");
 
 
-  localStorage.setItem(
-    CONTACT_KEY,
-    JSON.stringify(messages)
-  );
+  const isAllowed =
+
+    currentUser &&
+
+    Object.prototype.hasOwnProperty.call(
+      ADMIN_USERS,
+      currentUser
+    ) &&
+
+    isAdmin === "true";
 
 
-  renderContactMessages();
+  adminLinks.forEach(function (link) {
+
+    if (isAllowed) {
+
+      link.style.display =
+        "inline-flex";
+
+    } else {
+
+      link.style.display =
+        "none";
+
+    }
+
+  });
 
 }
 
 
-// إرسال رسالة جديدة
+// ==================================================
+// إظهار اسم المستخدم الحالي
+// ==================================================
 
-function bindContactForm() {
+function showCurrentUser() {
 
-  const form =
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+
+  const elements =
+    document.querySelectorAll(
+      "#currentUser, #usernameDisplay, .current-user"
+    );
+
+
+  elements.forEach(function (element) {
+
+    if (currentUser) {
+
+      element.textContent =
+        currentUser;
+
+    }
+
+  });
+
+}
+
+
+// ==================================================
+// تسجيل الخروج
+// ==================================================
+
+function setupLogout() {
+
+  const logoutButtons =
+    document.querySelectorAll(
+      "#logoutBtn, .logout-btn"
+    );
+
+
+  logoutButtons.forEach(function (button) {
+
+    button.addEventListener(
+      "click",
+      function (event) {
+
+        event.preventDefault();
+
+
+        // حذف جلسة المستخدم فقط
+        localStorage.removeItem(
+          "currentUser"
+        );
+
+        localStorage.removeItem(
+          "isAdmin"
+        );
+
+
+        // العودة إلى صفحة تسجيل الدخول
+        window.location.href =
+          "login.html";
+
+      }
+    );
+
+  });
+
+}
+
+
+// ==================================================
+// سجل تسجيل الدخول
+// ==================================================
+
+function showLoginHistory() {
+
+  const container =
+    document.getElementById(
+      "loginHistory"
+    );
+
+
+  if (!container) {
+
+    return;
+
+  }
+
+
+  let history = [];
+
+  try {
+
+    history =
+      JSON.parse(
+        localStorage.getItem(
+          "loginHistory"
+        ) || "[]"
+      );
+
+    if (!Array.isArray(history)) {
+      history = [];
+    }
+
+  } catch (error) {
+
+    history = [];
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  if (history.length === 0) {
+
+    container.innerHTML =
+      "<p>لا يوجد سجل تسجيل دخول</p>";
+
+    return;
+
+  }
+
+
+  history
+    .slice()
+    .reverse()
+    .forEach(function (item) {
+
+      const element =
+        document.createElement("div");
+
+
+      element.className =
+        "list-item";
+
+
+      element.innerHTML = `
+
+        <strong>
+          المستخدم: ${escapeHTML(item.username)}
+        </strong>
+
+        <br>
+
+        <span>
+          وقت الدخول: ${escapeHTML(item.time)}
+        </span>
+
+      `;
+
+
+      container.appendChild(
+        element
+      );
+
+    });
+
+}
+
+
+// ==================================================
+// نظام الرسائل - نموذج التواصل
+// ==================================================
+
+function setupContactForm() {
+
+  const contactForm =
     document.getElementById(
       "contactForm"
     );
 
 
-  if (!form) return;
+  if (!contactForm) {
+
+    return;
+
+  }
 
 
-  form.addEventListener(
+  contactForm.addEventListener(
     "submit",
-    function(event) {
+    function (event) {
 
       event.preventDefault();
 
 
       const senderName =
-        document
-          .getElementById(
-            "senderName"
-          )
-          .value
-          .trim();
-
+        document.getElementById(
+          "senderName"
+        );
 
       const contactTo =
-        document
-          .getElementById(
-            "contactTo"
-          )
-          .value;
-
+        document.getElementById(
+          "contactTo"
+        );
 
       const messageText =
-        document
-          .getElementById(
-            "messageText"
-          )
-          .value
-          .trim();
+        document.getElementById(
+          "messageText"
+        );
 
-
-      const status =
+      const contactStatus =
         document.getElementById(
           "contactStatus"
         );
 
 
       if (
-        senderName === "" ||
-        messageText === ""
+        !senderName ||
+        !contactTo ||
+        !messageText
       ) {
-
-        status.className =
-          "status error";
-
-        status.textContent =
-          "يرجى كتابة الاسم والرسالة.";
 
         return;
 
       }
 
 
-      const messages =
-        JSON.parse(
-          localStorage.getItem(
-            CONTACT_KEY
-          ) || "[]"
-        );
+      const name =
+        senderName.value.trim();
+
+      const receiver =
+        contactTo.value;
+
+      const message =
+        messageText.value.trim();
 
 
-      const newMessage = {
+      // التحقق من البيانات
+      if (
+        name === "" ||
+        message === ""
+      ) {
+
+        if (contactStatus) {
+
+          contactStatus.textContent =
+            "يرجى تعبئة الاسم والرسالة";
+
+          contactStatus.className =
+            "status error";
+
+        }
+
+        return;
+
+      }
+
+
+      // الحصول على الرسائل القديمة
+      let messages = [];
+
+      try {
+
+        messages =
+          JSON.parse(
+            localStorage.getItem(
+              "contactMessages"
+            ) || "[]"
+          );
+
+        if (!Array.isArray(messages)) {
+          messages = [];
+        }
+
+      } catch (error) {
+
+        messages = [];
+
+      }
+
+
+      // إضافة الرسالة الجديدة
+      messages.push({
 
         id:
           Date.now(),
 
-        name:
-          senderName,
+        sender:
+          name,
 
-        person:
-          contactTo,
+        receiver:
+          receiver,
 
-        text:
-          messageText,
+        message:
+          message,
 
-        edited:
-          false,
+        time:
+          new Date().toLocaleString("ar-JO"),
 
-        createdAt:
-          new Date().toISOString()
+        user:
+          localStorage.getItem(
+            "currentUser"
+          ) || name
 
-      };
-
-
-      messages.push(
-        newMessage
-      );
+      });
 
 
+      // حفظ الرسائل
       localStorage.setItem(
-        CONTACT_KEY,
+
+        "contactMessages",
+
         JSON.stringify(messages)
+
       );
 
 
-      status.className =
-        "status";
+      // تنظيف الحقول
+      senderName.value = "";
+
+      messageText.value = "";
 
 
-      status.textContent =
-        "تم إرسال الرسالة بنجاح.";
+      // إظهار رسالة النجاح
+      if (contactStatus) {
+
+        contactStatus.textContent =
+          "تم إرسال الرسالة وحفظها بنجاح";
+
+        contactStatus.className =
+          "status";
+
+      }
 
 
-      document.getElementById(
-        "messageText"
-      ).value = "";
-
-
-      renderContactMessages();
+      // تحديث القائمة
+      showContactMessages();
 
     }
   );
@@ -547,554 +713,787 @@ function bindContactForm() {
 }
 
 
+// ==================================================
+// عرض الرسائل المحفوظة
+// ==================================================
 
-// ========================================
-// ================ الحسابات ===============
-// ========================================
+function showContactMessages() {
+
+  const container =
+    document.getElementById(
+      "contactList"
+    );
 
 
+  if (!container) {
+
+    return;
+
+  }
+
+
+  let messages = [];
+
+  try {
+
+    messages =
+      JSON.parse(
+        localStorage.getItem(
+          "contactMessages"
+        ) || "[]"
+      );
+
+    if (!Array.isArray(messages)) {
+      messages = [];
+    }
+
+  } catch (error) {
+
+    messages = [];
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  if (messages.length === 0) {
+
+    container.innerHTML =
+      "<p>لا توجد رسائل محفوظة</p>";
+
+    return;
+
+  }
+
+
+  messages
+    .slice()
+    .reverse()
+    .forEach(function (item) {
+
+      const element =
+        document.createElement("div");
+
+
+      element.className =
+        "list-item";
+
+
+      element.innerHTML = `
+
+        <strong>
+          من: ${escapeHTML(item.sender)}
+        </strong>
+
+        <br>
+
+        <strong>
+          إلى: ${escapeHTML(item.receiver)}
+        </strong>
+
+        <br>
+
+        <p>
+          ${escapeHTML(item.message)}
+        </p>
+
+        <small>
+          ${escapeHTML(item.time)}
+        </small>
+
+      `;
+
+
+      container.appendChild(
+        element
+      );
+
+    });
+
+}
+
+
+// ==================================================
+// نظام الحسابات
+// ==================================================
+
+function setupMarketForm() {
+
+  const marketForm =
+    document.getElementById(
+      "marketForm"
+    );
+
+
+  if (!marketForm) {
+
+    return;
+
+  }
+
+
+  marketForm.addEventListener(
+    "submit",
+    function (event) {
+
+      event.preventDefault();
+
+
+      const accountName =
+        document.getElementById(
+          "accountName"
+        );
+
+      const accountType =
+        document.getElementById(
+          "accountType"
+        );
+
+      const primeType =
+        document.getElementById(
+          "primeType"
+        );
+
+      const accountPrice =
+        document.getElementById(
+          "accountPrice"
+        );
+
+      const accountSpecs =
+        document.getElementById(
+          "accountSpecs"
+        );
+
+      const accountImageFile =
+        document.getElementById(
+          "accountImageFile"
+        );
+
+      const marketStatus =
+        document.getElementById(
+          "marketStatus"
+        );
+
+
+      if (
+        !accountName ||
+        !accountType ||
+        !primeType ||
+        !accountPrice ||
+        !accountSpecs
+      ) {
+
+        return;
+
+      }
+
+
+      const name =
+        accountName.value.trim();
+
+      const type =
+        accountType.value;
+
+      const prime =
+        primeType.value;
+
+      const price =
+        accountPrice.value;
+
+      const specs =
+        accountSpecs.value.trim();
+
+
+      // التحقق
+      if (
+        name === "" ||
+        price === "" ||
+        specs === ""
+      ) {
+
+        if (marketStatus) {
+
+          marketStatus.textContent =
+            "يرجى تعبئة جميع البيانات المطلوبة";
+
+          marketStatus.className =
+            "status error";
+
+        }
+
+        return;
+
+      }
+
+
+      let accounts = [];
+
+      try {
+
+        accounts =
+          JSON.parse(
+            localStorage.getItem(
+              "marketAccounts"
+            ) || "[]"
+          );
+
+        if (!Array.isArray(accounts)) {
+          accounts = [];
+        }
+
+      } catch (error) {
+
+        accounts = [];
+
+      }
+
+
+      // ==================================================
+      // حفظ الصور والفيديوهات
+      // ==================================================
+
+      const files =
+        accountImageFile
+          ? Array.from(accountImageFile.files)
+          : [];
+
+
+      const processFiles =
+        files.length
+          ? Promise.all(
+              files.map(function (file) {
+
+                return fileToDataURL(file);
+
+              })
+            )
+          : Promise.resolve([]);
+
+
+      processFiles.then(function (mediaFiles) {
+
+        const newAccount = {
+
+          id:
+            Date.now(),
+
+          name:
+            name,
+
+          type:
+            type,
+
+          prime:
+            prime,
+
+          price:
+            price,
+
+          specs:
+            specs,
+
+          media:
+            mediaFiles,
+
+          user:
+            localStorage.getItem(
+              "currentUser"
+            ) || "غير معروف",
+
+          time:
+            new Date().toLocaleString("ar-JO")
+
+        };
+
+
+        accounts.push(
+          newAccount
+        );
+
+
+        // حفظ الحساب
+        localStorage.setItem(
+
+          "marketAccounts",
+
+          JSON.stringify(accounts)
+
+        );
+
+
+        // تنظيف النموذج
+        accountName.value = "";
+
+        accountPrice.value = "";
+
+        accountSpecs.value = "";
+
+
+        if (accountImageFile) {
+
+          accountImageFile.value =
+            "";
+
+        }
+
+
+        // رسالة نجاح
+        if (marketStatus) {
+
+          marketStatus.textContent =
+            "تمت إضافة الحساب وحفظه بنجاح";
+
+          marketStatus.className =
+            "status";
+
+        }
+
+
+        // تحديث الحسابات
+        showMarketAccounts();
+
+      });
+
+    }
+  );
+
+}
+
+
+// ==================================================
 // عرض الحسابات
+// ==================================================
 
-function renderMarketCards() {
+function showMarketAccounts() {
 
-  const marketCards =
+  const container =
     document.getElementById(
       "marketCards"
     );
 
 
-  if (!marketCards) return;
+  if (!container) {
+
+    return;
+
+  }
 
 
-  const accounts =
-    JSON.parse(
-      localStorage.getItem(
-        MARKET_KEY
-      ) || "[]"
-    );
+  let accounts = [];
+
+  try {
+
+    accounts =
+      JSON.parse(
+        localStorage.getItem(
+          "marketAccounts"
+        ) || "[]"
+      );
+
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+    }
+
+  } catch (error) {
+
+    accounts = [];
+
+  }
+
+
+  container.innerHTML = "";
 
 
   if (accounts.length === 0) {
 
-    marketCards.innerHTML = `
-      <div class="market-card">
-
-        <p class="muted">
-          لا توجد حسابات معروضة حاليا.
-        </p>
-
-      </div>
-    `;
+    container.innerHTML =
+      "<p>لا توجد حسابات معروضة حاليا</p>";
 
     return;
 
   }
 
 
-  marketCards.innerHTML =
-    accounts.map((account, index) => {
+  accounts
+    .slice()
+    .reverse()
+    .forEach(function (account) {
 
-      return `
-
-        <div
-          class="market-card"
-          id="account-${index}"
-        >
+      const card =
+        document.createElement("div");
 
 
-          <!-- صورة الحساب -->
-
-          ${
-            account.image
-              ? `
-                <img
-                  src="${account.image}"
-                  alt="${escapeHtml(account.name)}"
-                  style="
-                    width:100%;
-                    max-width:300px;
-                    height:auto;
-                    border-radius:10px;
-                    margin-bottom:10px;
-                  "
-                >
-              `
-              : ""
-          }
+      card.className =
+        "panel market-card";
 
 
-          <!-- عرض بيانات الحساب -->
-
-          <div id="account-view-${index}">
-
-            <h3>
-              ${escapeHtml(account.name)}
-            </h3>
+      let mediaHTML = "";
 
 
-            <p>
-              النوع:
-              ${escapeHtml(account.type)}
-            </p>
+      if (
+        account.media &&
+        account.media.length > 0
+      ) {
+
+        mediaHTML = `
+
+          <div class="account-media">
+
+            ${account.media
+              .map(function (media) {
+
+                if (
+                  media.type &&
+                  media.type.startsWith(
+                    "video/"
+                  )
+                ) {
+
+                  return `
+
+                    <video
+                      src="${media.data}"
+                      controls
+                      style="
+                        max-width:100%;
+                        border-radius:8px;
+                      "
+                    ></video>
+
+                  `;
+
+                }
 
 
-            <p>
-              البرايم:
-              ${escapeHtml(
-                account.primeType || ""
-              )}
-            </p>
+                return `
 
-
-            <p>
-              السعر:
-              ${escapeHtml(account.price)}
-              دينار
-            </p>
-
-
-            <p>
-              ${escapeHtml(account.specs)}
-            </p>
-
-
-            ${
-              account.edited
-                ? `
-                  <small
-                    class="muted"
-                    style="display:block;margin-bottom:8px;"
+                  <img
+                    src="${media.data}"
+                    alt="صورة الحساب"
+                    style="
+                      max-width:100%;
+                      border-radius:8px;
+                    "
                   >
-                    تم تعديل الحساب
-                  </small>
-                `
-                : ""
-            }
 
+                `;
 
-            <!-- أزرار الحساب -->
-
-            <div
-              style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-                margin-top:12px;
-              "
-            >
-
-              <button
-                type="button"
-                class="btn secondary small"
-                onclick="editAccount(${index})"
-              >
-                تعديل الحساب
-              </button>
-
-
-              <button
-                type="button"
-                class="btn small"
-                onclick="deleteAccount(${index})"
-              >
-                حذف الحساب
-              </button>
-
-            </div>
+              })
+              .join("")}
 
           </div>
 
+        `;
 
-          <!-- ================================= -->
-          <!-- نموذج تعديل الحساب -->
-          <!-- ================================= -->
-
-          <div
-            id="account-edit-${index}"
-            style="
-              display:none;
-              margin-top:15px;
-            "
-          >
+      }
 
 
-            <label>
-              اسم الحساب
-            </label>
+      card.innerHTML = `
 
+        ${mediaHTML}
 
-            <input
-              id="edit-account-name-${index}"
-              class="input"
-              type="text"
-              value="${escapeHtml(account.name)}"
-            >
+        <h3>
+          ${escapeHTML(account.name)}
+        </h3>
 
+        <p>
+          النوع:
+          ${escapeHTML(account.type)}
+        </p>
 
-            <label>
-              نوع الحساب
-            </label>
+        <p>
+          ${escapeHTML(account.prime)}
+        </p>
 
+        <p>
+          السعر:
+          ${escapeHTML(String(account.price))}
+          دينار
+        </p>
 
-            <select
-              id="edit-account-type-${index}"
-            >
+        <p>
+          ${escapeHTML(account.specs)}
+        </p>
 
-              <option
-                value="نادر"
-                ${
-                  account.type === "نادر"
-                    ? "selected"
-                    : ""
-                }
-              >
-                نادر
-              </option>
+        <small>
+          أضيف بواسطة:
+          ${escapeHTML(account.user)}
+        </small>
 
+        <br>
 
-              <option
-                value="كلاسيكي"
-                ${
-                  account.type === "كلاسيكي"
-                    ? "selected"
-                    : ""
-                }
-              >
-                كلاسيكي
-              </option>
-
-
-              <option
-                value="احداث"
-                ${
-                  account.type === "احداث"
-                    ? "selected"
-                    : ""
-                }
-              >
-                احداث
-              </option>
-
-
-              <option
-                value="مختلط"
-                ${
-                  account.type === "مختلط"
-                    ? "selected"
-                    : ""
-                }
-              >
-                مختلط
-              </option>
-
-            </select>
-
-
-            <label>
-              البرايم
-            </label>
-
-
-            <select
-              id="edit-account-prime-${index}"
-            >
-
-              ${
-                [
-                  "برايم 1",
-                  "برايم 2",
-                  "برايم 3",
-                  "برايم 4",
-                  "برايم 5",
-                  "برايم 6",
-                  "برايم 7",
-                  "برايم 8"
-                ]
-                .map(prime => `
-                  <option
-                    value="${prime}"
-                    ${
-                      account.primeType === prime
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    ${prime}
-                  </option>
-                `)
-                .join("")
-              }
-
-            </select>
-
-
-            <label>
-              السعر بالدينار الأردني
-            </label>
-
-
-            <input
-              id="edit-account-price-${index}"
-              class="input"
-              type="number"
-              value="${escapeHtml(account.price)}"
-            >
-
-
-            <label>
-              مواصفات الحساب
-            </label>
-
-
-            <textarea
-              id="edit-account-specs-${index}"
-              rows="4"
-            >${escapeHtml(account.specs)}</textarea>
-
-
-            <label>
-              تغيير صورة الحساب
-            </label>
-
-
-            <input
-              id="edit-account-image-${index}"
-              class="input"
-              type="file"
-              accept="image/*"
-            >
-
-
-            <!-- أزرار التعديل -->
-
-            <div
-              style="
-                display:flex;
-                gap:8px;
-                flex-wrap:wrap;
-                margin-top:10px;
-              "
-            >
-
-              <button
-                type="button"
-                class="btn small"
-                onclick="saveAccountEdit(${index})"
-              >
-                حفظ التعديل
-              </button>
-
-
-              <button
-                type="button"
-                class="btn secondary small"
-                onclick="cancelAccountEdit(${index})"
-              >
-                إلغاء
-              </button>
-
-            </div>
-
-
-            <div
-              id="account-edit-status-${index}"
-              class="status"
-            ></div>
-
-          </div>
-
-        </div>
+        <small>
+          ${escapeHTML(account.time)}
+        </small>
 
       `;
 
-    }).join("");
+
+      container.appendChild(
+        card
+      );
+
+    });
 
 }
 
 
-// فتح تعديل الحساب
+// ==================================================
+// معاينة الصور والفيديو قبل الإضافة
+// ==================================================
 
-function editAccount(index) {
+function setupMediaPreview() {
 
-  const accountView =
+  const input =
     document.getElementById(
-      `account-view-${index}`
+      "accountImageFile"
     );
 
-
-  const accountEdit =
+  const previewArea =
     document.getElementById(
-      `account-edit-${index}`
+      "previewArea"
+    );
+
+  const previewIndicator =
+    document.getElementById(
+      "previewIndicator"
+    );
+
+  const prevButton =
+    document.getElementById(
+      "prevMedia"
+    );
+
+  const nextButton =
+    document.getElementById(
+      "nextMedia"
     );
 
 
   if (
-    !accountView ||
-    !accountEdit
+    !input ||
+    !previewArea
   ) {
+
     return;
+
   }
 
 
-  accountView.style.display =
-    "none";
+  let files = [];
+
+  let currentIndex = 0;
 
 
-  accountEdit.style.display =
-    "block";
+  input.addEventListener(
+    "change",
+    function () {
 
-}
+      files =
+        Array.from(
+          input.files
+        );
 
+      currentIndex = 0;
 
-// حفظ تعديل الحساب
+      updatePreview();
 
-function saveAccountEdit(index) {
-
-  const nameInput =
-    document.getElementById(
-      `edit-account-name-${index}`
-    );
-
-
-  const typeInput =
-    document.getElementById(
-      `edit-account-type-${index}`
-    );
+    }
+  );
 
 
-  const primeInput =
-    document.getElementById(
-      `edit-account-prime-${index}`
-    );
+  function updatePreview() {
+
+    previewArea.innerHTML =
+      "";
 
 
-  const priceInput =
-    document.getElementById(
-      `edit-account-price-${index}`
-    );
+    if (files.length === 0) {
 
+      if (previewIndicator) {
 
-  const specsInput =
-    document.getElementById(
-      `edit-account-specs-${index}`
-    );
+        previewIndicator.textContent =
+          "";
 
+      }
 
-  const imageInput =
-    document.getElementById(
-      `edit-account-image-${index}`
-    );
+      if (prevButton) {
 
+        prevButton.style.display =
+          "none";
 
-  const status =
-    document.getElementById(
-      `account-edit-status-${index}`
-    );
+      }
 
+      if (nextButton) {
 
-  if (
-    !nameInput ||
-    !typeInput ||
-    !primeInput ||
-    !priceInput ||
-    !specsInput
-  ) {
-    return;
-  }
+        nextButton.style.display =
+          "none";
 
+      }
 
-  const name =
-    nameInput.value.trim();
-
-
-  const type =
-    typeInput.value;
-
-
-  const primeType =
-    primeInput.value;
-
-
-  const price =
-    priceInput.value.trim();
-
-
-  const specs =
-    specsInput.value.trim();
-
-
-  if (
-    name === "" ||
-    price === "" ||
-    specs === ""
-  ) {
-
-    if (status) {
-
-      status.className =
-        "status error";
-
-      status.textContent =
-        "يرجى تعبئة جميع البيانات.";
+      return;
 
     }
 
-    return;
+
+    const file =
+      files[currentIndex];
+
+
+    if (
+      file.type.startsWith(
+        "video/"
+      )
+    ) {
+
+      const video =
+        document.createElement(
+          "video"
+        );
+
+      video.src =
+        URL.createObjectURL(
+          file
+        );
+
+      video.controls =
+        true;
+
+      video.style.maxWidth =
+        "100%";
+
+      video.style.maxHeight =
+        "100%";
+
+      previewArea.appendChild(
+        video
+      );
+
+    } else {
+
+      const image =
+        document.createElement(
+          "img"
+        );
+
+      image.src =
+        URL.createObjectURL(
+          file
+        );
+
+      image.style.maxWidth =
+        "100%";
+
+      image.style.maxHeight =
+        "100%";
+
+      image.style.objectFit =
+        "contain";
+
+      previewArea.appendChild(
+        image
+      );
+
+    }
+
+
+    if (previewIndicator) {
+
+      previewIndicator.textContent =
+
+        "الملف " +
+
+        (currentIndex + 1) +
+
+        " من " +
+
+        files.length;
+
+    }
+
+
+    if (prevButton) {
+
+      prevButton.style.display =
+        files.length > 1
+          ? "inline-flex"
+          : "none";
+
+    }
+
+
+    if (nextButton) {
+
+      nextButton.style.display =
+        files.length > 1
+          ? "inline-flex"
+          : "none";
+
+    }
 
   }
 
 
-  const accounts =
-    JSON.parse(
-      localStorage.getItem(
-        MARKET_KEY
-      ) || "[]"
+  if (prevButton) {
+
+    prevButton.addEventListener(
+      "click",
+      function () {
+
+        if (files.length === 0) {
+          return;
+        }
+
+        currentIndex =
+
+          (currentIndex - 1 + files.length) %
+
+          files.length;
+
+        updatePreview();
+
+      }
     );
 
-
-  if (!accounts[index]) {
-
-    return;
-
   }
 
 
-  // تحديث البيانات
+  if (nextButton) {
 
-  accounts[index].name =
-    name;
+    nextButton.addEventListener(
+      "click",
+      function () {
 
+        if (files.length === 0) {
+          return;
+        }
 
-  accounts[index].type =
-    type;
+        currentIndex =
 
+          (currentIndex + 1) %
 
-  accounts[index].primeType =
-    primeType;
+          files.length;
 
+        updatePreview();
 
-  accounts[index].price =
-    price;
+      }
+    );
 
+  }
 
-  accounts[index].specs =
-    specs;
-
-
-  accounts[index].edited =
-    true;
-
-
-  accounts[index].editedAt =
-    new Date().toISOString();
+}
 
 
-  // إذا اختار صورة جديدة
+// ==================================================
+// تحويل الملفات إلى Data URL
+// ==================================================
 
-  if (
-    imageInput &&
-    imageInput.files &&
-    imageInput.files[0]
+function fileToDataURL(file) {
+
+  return new Promise(function (
+    resolve,
+    reject
   ) {
 
     const reader =
@@ -1102,509 +1501,1047 @@ function saveAccountEdit(index) {
 
 
     reader.onload =
-      function() {
+      function () {
 
-        accounts[index].image =
-          reader.result;
+        resolve({
 
+          name:
+            file.name,
 
-        localStorage.setItem(
-          MARKET_KEY,
-          JSON.stringify(accounts)
-        );
+          type:
+            file.type,
 
+          data:
+            reader.result
 
-        renderMarketCards();
+        });
 
       };
 
 
+    reader.onerror =
+      reject;
+
+
     reader.readAsDataURL(
-      imageInput.files[0]
+      file
     );
 
-  }
-
-  else {
-
-    // حفظ بدون تغيير الصورة
-
-    localStorage.setItem(
-      MARKET_KEY,
-      JSON.stringify(accounts)
-    );
-
-
-    renderMarketCards();
-
-  }
+  });
 
 }
 
 
-// إلغاء تعديل الحساب
+// ==================================================
+// الوضع الليلي
+// ==================================================
 
-function cancelAccountEdit(index) {
+function setupTheme() {
 
-  const accountView =
+  const themeButton =
     document.getElementById(
-      `account-view-${index}`
+      "themeToggle"
     );
 
 
-  const accountEdit =
-    document.getElementById(
-      `account-edit-${index}`
+  // استرجاع الوضع المحفوظ
+  const savedTheme =
+    localStorage.getItem(
+      "theme"
     );
 
 
   if (
-    !accountView ||
-    !accountEdit
+    savedTheme === "dark"
   ) {
-    return;
+
+    document.body.classList.add(
+      "dark-mode"
+    );
+
   }
 
 
-  accountEdit.style.display =
-    "none";
+  if (!themeButton) {
+
+    return;
+
+  }
 
 
-  accountView.style.display =
-    "block";
+  themeButton.addEventListener(
+    "click",
+    function () {
+
+      document.body.classList.toggle(
+        "dark-mode"
+      );
+
+
+      const isDark =
+        document.body.classList.contains(
+          "dark-mode"
+        );
+
+
+      localStorage.setItem(
+
+        "theme",
+
+        isDark
+          ? "dark"
+          : "light"
+
+      );
+
+    }
+  );
 
 }
 
 
-// حذف الحساب
+// ==================================================
+// نظام اللغة
+// ==================================================
 
-function deleteAccount(index) {
+function setupLanguage() {
 
-  const confirmDelete =
-    confirm(
-      "هل أنت متأكد أنك تريد حذف هذا الحساب؟"
-    );
-
-
-  if (!confirmDelete) {
-
-    return;
-
-  }
-
-
-  const accounts =
-    JSON.parse(
-      localStorage.getItem(
-        MARKET_KEY
-      ) || "[]"
-    );
-
-
-  if (!accounts[index]) {
-
-    alert(
-      "لم يتم العثور على الحساب."
-    );
-
-    return;
-
-  }
-
-
-  accounts.splice(
-    index,
-    1
-  );
-
-
-  localStorage.setItem(
-    MARKET_KEY,
-    JSON.stringify(accounts)
-  );
-
-
-  renderMarketCards();
-
-}
-
-
-// إضافة حساب جديد
-
-function bindMarketForm() {
-
-  const form =
+  const languageButton =
     document.getElementById(
-      "marketForm"
+      "langToggle"
     );
 
 
-  if (!form) return;
+  if (!languageButton) {
+
+    return;
+
+  }
 
 
-  form.addEventListener(
-    "submit",
-    function(event) {
-
-      event.preventDefault();
-
-
-      const accountName =
-        document
-          .getElementById(
-            "accountName"
-          )
-          .value
-          .trim();
+  // ملاحظة:
+  // هذا الجزء لا يغير اللغة تلقائيا
+  // إلا إذا كان لديك نظام ترجمة data-i18n
+  // حتى لا تتغير النصوص العربية التي ليس لها ترجمة.
 
 
-      const accountType =
-        document
-          .getElementById(
-            "accountType"
-          )
-          .value;
+  languageButton.addEventListener(
+    "click",
+    function () {
+
+      const currentLanguage =
+        localStorage.getItem(
+          "language"
+        ) || "ar";
 
 
-      const primeType =
-        document
-          .getElementById(
-            "primeType"
-          )
-          .value;
+      const newLanguage =
+        currentLanguage === "ar"
+          ? "en"
+          : "ar";
 
 
-      const accountPrice =
-        document
-          .getElementById(
-            "accountPrice"
-          )
-          .value
-          .trim();
+      localStorage.setItem(
+        "language",
+        newLanguage
+      );
 
 
-      const accountSpecs =
-        document
-          .getElementById(
-            "accountSpecs"
-          )
-          .value
-          .trim();
+      applyLanguage(
+        newLanguage
+      );
+
+    }
+  );
 
 
-      const imageFile =
-        document
-          .getElementById(
-            "accountImageFile"
-          );
+  const savedLanguage =
+    localStorage.getItem(
+      "language"
+    ) || "ar";
 
 
-      const status =
-        document.getElementById(
-          "marketStatus"
+  applyLanguage(
+    savedLanguage
+  );
+
+}
+
+
+// ==================================================
+// تطبيق اللغة على العناصر التي تحتوي data-i18n فقط
+// ==================================================
+
+function applyLanguage(language) {
+
+  const translations = {
+
+    ar: {
+
+      nav_intro:
+        "المقدمة",
+
+      nav_clan:
+        "عن الكلان",
+
+      nav_competitions:
+        "المسابقات",
+
+      nav_contact:
+        "التواصل",
+
+      nav_market:
+        "الحسابات",
+
+      nav_links:
+        "الروابط",
+
+      contacts_title:
+        "تواصل مع الإداريين",
+
+      contact_message_title:
+        "الرسائل المرسلة",
+
+      market_title:
+        "بيع وشراء الحسابات داخل اللعبة",
+
+      market_desc:
+        "يمكنك عرض الحسابات المتاحة للبيع، مع صورة، السعر، مواصفات الحساب، وروابط التواصل مع الكلان والقيادة.",
+
+      market_form:
+        "إضافة حساب للبيع او طلب شراء",
+
+      label_name:
+        "اسم الحساب",
+
+      label_type:
+        "نوع الحساب",
+
+      label_price:
+        "السعر بالدينار الأردني",
+
+      label_upload:
+        "رفع صور/فيديو من الجهاز",
+
+      label_specs:
+        "مواصفات الحساب",
+
+      btn_add:
+        "إضافة الحساب",
+
+      intro_title:
+        "مرحباً بك في كيان JO FF",
+
+      intro_text1:
+        "الكلان JO FF هو مجتمع لعب احترافي في Free Fire يضم لاعبين من مختلف المستويات، ويهتم بتطوير الأداء داخل Clash Squad و Battle Royale عبر تنظيم فعاليات، تدريب مستمر، وتوزيع مهام واضحة بين الأعضاء.",
+
+      intro_text2:
+        "في الكلان نركز على روح الفريق والعمل الجماعي، مع حرص خاص على احترام النظام، الالتزام بالقواعد، وتحفيز اللاعبين على التقدم مستواهم بانتظام في كل يوم."
+
+    },
+
+
+    en: {
+
+      nav_intro:
+        "Introduction",
+
+      nav_clan:
+        "About Clan",
+
+      nav_competitions:
+        "Competitions",
+
+      nav_contact:
+        "Contact",
+
+      nav_market:
+        "Accounts",
+
+      nav_links:
+        "Links",
+
+      contacts_title:
+        "Contact Administrators",
+
+      contact_message_title:
+        "Sent Messages",
+
+      market_title:
+        "Buy and Sell Game Accounts",
+
+      market_desc:
+        "You can display accounts available for sale with images, price, account specifications, and contact links.",
+
+      market_form:
+        "Add an Account for Sale or Request a Purchase",
+
+      label_name:
+        "Account Name",
+
+      label_type:
+        "Account Type",
+
+      label_price:
+        "Price in Jordanian Dinar",
+
+      label_upload:
+        "Upload Images/Video",
+
+      label_specs:
+        "Account Specifications",
+
+      btn_add:
+        "Add Account",
+
+      intro_title:
+        "Welcome to JO FF Clan",
+
+      intro_text1:
+        "JO FF Clan is a professional Free Fire gaming community with players of different skill levels.",
+
+      intro_text2:
+        "We focus on teamwork, organization, rules, and helping players improve their skills every day."
+
+    }
+
+  };
+
+
+  // تغيير اتجاه الصفحة
+  document.documentElement.lang =
+    language;
+
+  document.documentElement.dir =
+    language === "ar"
+      ? "rtl"
+      : "ltr";
+
+
+  // تغيير النصوص التي تحتوي data-i18n فقط
+  document
+    .querySelectorAll(
+      "[data-i18n]"
+    )
+    .forEach(function (element) {
+
+      const key =
+        element.getAttribute(
+          "data-i18n"
         );
 
 
       if (
-        accountName === "" ||
-        accountPrice === "" ||
-        accountSpecs === ""
+        translations[language] &&
+        translations[language][key]
       ) {
+
+const navIcon = element.querySelector(".nav-icon");
+
+if (navIcon) {
+  const icon = navIcon.textContent;
+
+  element.innerHTML =
+    `<span class="nav-icon">${icon}</span>
+     <span>${translations[language][key]}</span>`;
+} else {
+  element.textContent =
+    translations[language][key];
+}
+
+      }
+
+    });
+
+
+  // تحديث زر اللغة
+  const languageButton =
+    document.getElementById(
+      "langToggle"
+    );
+
+
+  if (languageButton) {
+
+    languageButton.textContent =
+
+      language === "ar"
+        ? "EN"
+        : "AR";
+
+  }
+
+}
+
+
+// ==================================================
+// حماية من إدخال HTML ضار
+// ==================================================
+
+function escapeHTML(value) {
+
+  return String(value)
+
+    .replace(   
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}             
+
+
+// ==================================================
+// انتقال سلس بين صفحات الموقع
+// ==================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  // روابط الانتقال داخل الموقع
+  const pageLinks = document.querySelectorAll(
+    'a[href]:not([target="_blank"])'
+  );
+
+  pageLinks.forEach(function (link) {
+
+    link.addEventListener("click", function (event) {
+
+      const href = link.getAttribute("href");
+
+      // تجاهل الروابط الخاصة
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("javascript:") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:")
+      ) {
+        return;
+      }
+
+      // تجاهل الروابط الخارجية
+      if (
+        link.hostname &&
+        link.hostname !== window.location.hostname
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      // إضافة تأثير الخروج
+      document.body.classList.add("page-exit");
+
+      // الانتقال بعد انتهاء الحركة
+      setTimeout(function () {
+        window.location.href = href;
+      }, 450);
+
+    });
+
+  });
+
+});
+
+// ==================================================
+// نظام إدارة أعضاء JO FF Clan
+// ==================================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    setupMembersSystem();
+
+  }
+);
+
+
+function setupMembersSystem() {
+
+  const memberForm =
+    document.getElementById(
+      "memberForm"
+    );
+
+
+  const membersList =
+    document.getElementById(
+      "adminMembersList"
+    );
+
+
+  const status =
+    document.getElementById(
+      "memberStatus"
+    );
+
+
+  // إذا لم تكن لوحة الإدارة
+  if (
+    !memberForm ||
+    !membersList
+  ) {
+
+    return;
+
+  }
+
+
+  // تحميل الأعضاء
+  loadAdminMembers();
+
+
+  // ==================================================
+  // إضافة عضو
+  // ==================================================
+
+  memberForm.addEventListener(
+    "submit",
+    async function (
+      event
+    ) {
+
+      event.preventDefault();
+
+
+      const memberId =
+        document.getElementById(
+          "memberId"
+        ).value;
+
+
+      const name =
+        document.getElementById(
+          "memberName"
+        ).value.trim();
+
+
+      const rank =
+        document.getElementById(
+          "memberRank"
+        ).value;
+
+
+      const level =
+        document.getElementById(
+          "memberLevel"
+        ).value.trim();
+
+
+      const description =
+        document.getElementById(
+          "memberDescription"
+        ).value.trim();
+
+
+      const image =
+        document.getElementById(
+          "memberImage"
+        ).files[0];
+
+
+      const formData =
+        new FormData();
+
+
+      formData.append(
+        "name",
+        name
+      );
+
+
+      formData.append(
+        "rank",
+        rank
+      );
+
+
+      formData.append(
+        "level",
+        level
+      );
+
+
+      formData.append(
+        "description",
+        description
+      );
+
+
+      if (image) {
+
+        formData.append(
+          "image",
+          image
+        );
+
+      }
+
+
+      try {
+
+        let response;
+
+
+        if (memberId) {
+
+          response =
+            await fetch(
+              "/api/members/" +
+              memberId,
+              {
+
+                method:
+                  "PUT",
+
+                body:
+                  formData
+
+              }
+            );
+
+        } else {
+
+          response =
+            await fetch(
+              "/api/members",
+              {
+
+                method:
+                  "POST",
+
+                body:
+                  formData
+
+              }
+            );
+
+        }
+
+
+        const data =
+          await response.json();
+
+
+        if (
+          !response.ok
+        ) {
+
+          throw new Error(
+            data.message
+          );
+
+        }
+
+
+        status.textContent =
+          data.message;
+
+
+        status.className =
+          "status";
+
+
+        memberForm.reset();
+
+
+        document.getElementById(
+          "memberId"
+        ).value = "";
+
+
+        loadAdminMembers();
+
+
+      } catch (error) {
+
+        status.textContent =
+          error.message ||
+          "حدث خطأ";
 
         status.className =
           "status error";
 
-        status.textContent =
-          "يرجى تعبئة جميع البيانات.";
+      }
+
+    }
+  );
+
+
+  // ==================================================
+  // عرض الأعضاء في الإدارة
+  // ==================================================
+
+  async function loadAdminMembers() {
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/members"
+        );
+
+
+      const members =
+        await response.json();
+
+
+      membersList.innerHTML =
+        "";
+
+
+      if (
+        members.length === 0
+      ) {
+
+        membersList.innerHTML =
+          "<p>لا يوجد أعضاء حاليا.</p>";
 
         return;
 
       }
 
 
-      const saveAccount =
-        function(imageData) {
+      members.forEach(
+        function (
+          member
+        ) {
 
-          const accounts =
-            JSON.parse(
-              localStorage.getItem(
-                MARKET_KEY
-              ) || "[]"
+          const card =
+            document.createElement(
+              "div"
             );
 
 
-          accounts.push({
-
-            name:
-              accountName,
-
-            type:
-              accountType,
-
-            primeType:
-              primeType,
-
-            price:
-              accountPrice,
-
-            specs:
-              accountSpecs,
-
-            image:
-              imageData || "",
-
-            edited:
-              false
-
-          });
+          card.className =
+            "panel";
 
 
-          localStorage.setItem(
-            MARKET_KEY,
-            JSON.stringify(accounts)
+          const imageHTML =
+            member.image
+
+              ? `
+                <img
+                  src="${member.image}"
+                  style="
+                    width:100%;
+                    height:180px;
+                    object-fit:cover;
+                    border-radius:12px;
+                    margin-bottom:12px;
+                  "
+                >
+              `
+
+              : "";
+
+
+          card.innerHTML = `
+
+            ${imageHTML}
+
+            <h3>
+              👤 ${escapeHTML(member.name)}
+            </h3>
+
+            <p>
+              🏅 الرتبة:
+              ${escapeHTML(member.rank)}
+            </p>
+
+            <p>
+              ⭐ المستوى:
+              ${escapeHTML(member.level || "غير محدد")}
+            </p>
+
+            <p>
+              ${escapeHTML(member.description || "")}
+            </p>
+
+            <div class="admin-actions">
+
+              <button
+                class="btn edit-member"
+                data-id="${member.id}"
+              >
+                ✏️ تعديل
+              </button>
+
+              <button
+                class="btn danger-btn delete-member"
+                data-id="${member.id}"
+              >
+                🗑️ حذف
+              </button>
+
+            </div>
+
+          `;
+
+
+          membersList.appendChild(
+            card
           );
 
-
-          status.className =
-            "status";
-
-
-          status.textContent =
-            "تمت إضافة الحساب بنجاح.";
+        }
+      );
 
 
-          form.reset();
+      // أزرار التعديل
+      document
+        .querySelectorAll(
+          ".edit-member"
+        )
+        .forEach(
+          function (
+            button
+          ) {
 
+            button.addEventListener(
+              "click",
+              function () {
 
-          renderMarketCards();
+                editMember(
+                  Number(
+                    button.dataset.id
+                  )
+                );
 
-        };
-
-
-      // رفع الصورة
-
-      if (
-        imageFile &&
-        imageFile.files &&
-        imageFile.files[0]
-      ) {
-
-        const reader =
-          new FileReader();
-
-
-        reader.onload =
-          function() {
-
-            saveAccount(
-              reader.result
+              }
             );
 
-          };
-
-
-        reader.readAsDataURL(
-          imageFile.files[0]
+          }
         );
 
-      }
 
-      else {
+      // أزرار الحذف
+      document
+        .querySelectorAll(
+          ".delete-member"
+        )
+        .forEach(
+          function (
+            button
+          ) {
 
-        saveAccount("");
+            button.addEventListener(
+              "click",
+              function () {
 
-      }
+                deleteMember(
+                  Number(
+                    button.dataset.id
+                  )
+                );
+
+              }
+            );
+
+          }
+        );
+
+
+    } catch (error) {
+
+      membersList.innerHTML =
+        "<p>تعذر تحميل الأعضاء.</p>";
 
     }
-  );
-
-}
-
-
-
-// ========================================
-// =============== الوضع الليلي =============
-// ========================================
-
-function setupTheme() {
-
-  const themeToggle =
-    document.getElementById(
-      "themeToggle"
-    );
-
-
-  const savedTheme =
-    localStorage.getItem(
-      THEME_KEY
-    );
-
-
-  if (
-    savedTheme === "light"
-  ) {
-
-    document.body.classList.add(
-      "light-theme"
-    );
 
   }
 
 
-  if (!themeToggle) return;
+  // ==================================================
+  // تعديل عضو
+  // ==================================================
 
-
-  themeToggle.addEventListener(
-    "click",
-    function() {
-
-      document.body.classList.toggle(
-        "light-theme"
-      );
-
-
-      const isLight =
-        document.body.classList.contains(
-          "light-theme"
-        );
-
-
-      localStorage.setItem(
-        THEME_KEY,
-        isLight
-          ? "light"
-          : "dark"
-      );
-
-    }
-  );
-
-}
-
-
-
-// ========================================
-// ================ تغيير اللغة ==============
-// ========================================
-
-function setupLanguage() {
-
-  const langToggle =
-    document.getElementById(
-      "langToggle"
-    );
-
-
-  if (!langToggle) return;
-
-
-  const savedLang =
-    localStorage.getItem(
-      LANG_KEY
-    );
-
-
-  if (
-    savedLang === "en"
+  async function editMember(
+    id
   ) {
 
-    document.documentElement.lang =
-      "en";
+    const response =
+      await fetch(
+        "/api/members"
+      );
 
-    document.documentElement.dir =
-      "ltr";
 
-    langToggle.textContent =
-      "AR";
+    const members =
+      await response.json();
+
+
+    const member =
+      members.find(
+        function (
+          item
+        ) {
+
+          return item.id === id;
+
+        }
+      );
+
+
+    if (!member) {
+
+      return;
+
+    }
+
+
+    document.getElementById(
+      "memberId"
+    ).value =
+      member.id;
+
+
+    document.getElementById(
+      "memberName"
+    ).value =
+      member.name;
+
+
+    document.getElementById(
+      "memberRank"
+    ).value =
+      member.rank;
+
+
+    document.getElementById(
+      "memberLevel"
+    ).value =
+      member.level || "";
+
+
+    document.getElementById(
+      "memberDescription"
+    ).value =
+      member.description || "";
+
+
+    document.querySelector(
+      "#memberForm button[type='submit']"
+    ).textContent =
+      "💾 حفظ التعديل";
+
+
+    window.scrollTo({
+
+      top:
+        document.getElementById(
+          "memberForm"
+        ).offsetTop - 100,
+
+      behavior:
+        "smooth"
+
+    });
 
   }
 
 
-  langToggle.addEventListener(
-    "click",
-    function() {
+  // ==================================================
+  // حذف عضو
+  // ==================================================
 
-      const currentLang =
-        document.documentElement.lang;
+  async function deleteMember(
+    id
+  ) {
+
+    const confirmed =
+      confirm(
+        "هل أنت متأكد من حذف هذا العضو؟"
+      );
+
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/members/" +
+          id,
+          {
+
+            method:
+              "DELETE"
+
+          }
+        );
+
+
+      const data =
+        await response.json();
 
 
       if (
-        currentLang === "ar"
+        !response.ok
       ) {
 
-        document.documentElement.lang =
-          "en";
-
-        document.documentElement.dir =
-          "ltr";
-
-        langToggle.textContent =
-          "AR";
-
-
-        localStorage.setItem(
-          LANG_KEY,
-          "en"
+        throw new Error(
+          data.message
         );
 
       }
 
-      else {
 
-        document.documentElement.lang =
-          "ar";
-
-        document.documentElement.dir =
-          "rtl";
-
-        langToggle.textContent =
-          "EN";
+      status.textContent =
+        data.message;
 
 
-        localStorage.setItem(
-          LANG_KEY,
-          "ar"
-        );
+      loadAdminMembers();
 
-      }
+
+    } catch (error) {
+
+      alert(
+        error.message
+      );
 
     }
-  );
+
+  }
 
 }
 
+// firebase-config.js
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCFCzrqmUGEyk0uc_mDWlGGkwDbZfTpTvU",
+  authDomain: "jo-ff-clan-c97c3.firebaseapp.com",
+  projectId: "jo-ff-clan-c97c3",
+  storageBucket: "jo-ff-clan-c97c3.firebasestorage.app",
+  messagingSenderId: "619526988519",
+  appId: "1:619526988519:web:7fd63f016a93191bf23842",
+  measurementId: "G-6KRVTVSC5F"
+};
 
 
-// ========================================
-// ================ تشغيل الموقع =============
-// ========================================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
-
-    // الرسائل
-
-    bindContactForm();
-
-    renderContactMessages();
 
 
-    // الحسابات
 
-    bindMarketForm();
-
-    renderMarketCards();
-
-
-    // الوضع الليلي
-
-    setupTheme();
-
-
-    // اللغة
-
-    setupLanguage();
-
-  }
-);

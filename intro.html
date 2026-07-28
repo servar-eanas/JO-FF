@@ -6,95 +6,410 @@
   <title>JO FF Clan | مقدمة</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+
+  <!-- =========================
+       شريط التنقل
+  ========================== -->
+
   <header class="topbar">
+
     <div class="container navbar">
+
+      <!-- الشعار -->
+
       <div class="brand">
+
         <div class="brand-badge">⚡</div>
+
         <span>JO FF Clan</span>
+
       </div>
+
+
+      <!-- القائمة الرئيسية -->
+
       <nav class="nav-links">
-        <a class="active" href="intro.html" data-i18n="nav_intro">المقدمة</a>
-        <a href="clan.html" data-i18n="nav_clan">عن الكلان</a>
-        <a href="competitions.html" data-i18n="nav_competitions">المسابقات</a>
-        <a href="contact.html" data-i18n="nav_contact">التواصل</a>
-        <a href="accounts.html" data-i18n="nav_market">الحسابات</a>
-        <a href="links.html" data-i18n="nav_links">الروابط</a>
+
+        <a href="intro.html" data-i18n="nav_intro">
+
+          <span class="nav-icon">🏠</span>
+
+          <span>المقدمة</span>
+
+        </a>
+
+
+        <a href="clan.html" data-i18n="nav_clan">
+
+          <span class="nav-icon">👥</span>
+
+          <span>عن الكلان</span>
+
+        </a>
+
+
+        <a href="competitions.html" data-i18n="nav_competitions">
+
+          <span class="nav-icon">🏆</span>
+
+          <span>المسابقات</span>
+
+        </a>
+
+
+        <a href="contact.html" data-i18n="nav_contact">
+
+          <span class="nav-icon">💬</span>
+
+          <span>التواصل</span>
+
+        </a>
+
+
+        <a href="accounts.html" data-i18n="nav_market">
+
+          <span class="nav-icon">📦</span>
+
+          <span>الحسابات</span>
+
+        </a>
+
+        <a href="player.html">
+  <span class="nav-icon">🎮</span>
+  <span>اللاعبين</span>
+</a>
+
+
+        <a href="links.html" data-i18n="nav_links">
+
+          <span class="nav-icon">🔗</span>
+
+          <span>الروابط</span>
+
+        </a>
+
+
+        <!-- لوحة الإدارة للمدير فقط -->
+
+        <a
+          href="admin.html"
+          id="adminLink"
+          style="display:none;"
+        >
+
+          <span class="nav-icon">🔐</span>
+
+          <span>لوحة الإدارة</span>
+
+        </a>
+
       </nav>
+
+
+      <!-- أزرار التحكم -->
+
       <div class="control-group">
-        <button id="themeToggle" class="btn secondary small" type="button">الوضع الليلي</button>
-        <button id="langToggle" class="btn secondary small" type="button">EN</button>
+
+        <button
+          id="themeToggle"
+          class="btn secondary small"
+          type="button"
+        >
+          الوضع الليلي
+        </button>
+
+
+        <button
+          id="langToggle"
+          class="btn secondary small"
+          type="button"
+        >
+          EN
+        </button>
+
       </div>
+
     </div>
+
   </header>
 
+
+  <!-- =========================
+       المحتوى الرئيسي
+  ========================== -->
+
   <main class="container hero">
+
+
+    <!-- بطاقة الترحيب -->
+
     <section class="hero-card">
+
       <div>
-        <div class="pill">JO FF</div>
-        <h1 class="hero-title" data-i18n="intro_title">مرحباً بك في كيان JO FF</h1>
-        <p class="hero-text" data-i18n="intro_text1">
+
+        <div class="pill">
+          JO FF
+        </div>
+
+
+        <h1
+          class="hero-title"
+          data-i18n="intro_title"
+        >
+          مرحبا بك في كيان JO FF
+        </h1>
+
+
+        <p
+          class="hero-text"
+          data-i18n="intro_text1"
+        >
           الكلان JO FF هو مجتمع لعب احترافي في Free Fire يضم لاعبين من مختلف المستويات، ويهتم بتطوير الأداء داخل Clash Squad و Battle Royale عبر تنظيم فعاليات، تدريب مستمر، وتوزيع مهام واضحة بين الأعضاء.
         </p>
-        <p class="hero-text" data-i18n="intro_text2">
+
+
+        <p
+          class="hero-text"
+          data-i18n="intro_text2"
+        >
           في الكلان نركز على روح الفريق والعمل الجماعي، مع حرص خاص على احترام النظام، الالتزام بالقواعد، وتحفيز اللاعبين على التقدم مستواهم بانتظام في كل يوم.
         </p>
-        <p class="muted"><span data-i18n="current_member">العضو الحالي</span>: <strong id="usernameDisplay"></strong></p>
+
+
+        <p class="muted">
+
+          <span data-i18n="current_member">
+            العضو الحالي
+          </span>
+
+          :
+
+          <strong id="usernameDisplay"></strong>
+
+        </p>
+
       </div>
+
+
+      <!-- صورة اللعبة -->
+
       <div class="hero-banner">
-        <img class="game-image" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80" alt="Free Fire gameplay" />
+
+        <img
+          class="game-image"
+          src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80"
+          alt="Free Fire gameplay"
+        />
+
       </div>
+
     </section>
 
-    <section class="grid-3" style="margin-top: 18px;">
+
+    <!-- =========================
+         المميزات
+    ========================== -->
+
+    <section
+      class="grid-3"
+      style="margin-top: 18px;"
+    >
+
+
       <div class="panel">
-        <h3 data-i18n="intro_features">أبرز المميزات</h3>
+
+        <h3 data-i18n="intro_features">
+          أبرز المميزات
+        </h3>
+
+
         <div class="list">
-          <div class="list-item" data-i18n="feature_1">تنظيم لفرق اللعب حسب المستوى</div>
-          <div class="list-item" data-i18n="feature_2">خطة تدريب يومية وسباق رتب</div>
-          <div class="list-item" data-i18n="feature_3">مسابقات أسبوعية وبوابة تواصل</div>
+
+          <div
+            class="list-item"
+            data-i18n="feature_1"
+          >
+            تنظيم لفرق اللعب حسب المستوى
+          </div>
+
+
+          <div
+            class="list-item"
+            data-i18n="feature_2"
+          >
+            خطة تدريب يومية وسباق رتب
+          </div>
+
+
+          <div
+            class="list-item"
+            data-i18n="feature_3"
+          >
+            مسابقات أسبوعية وبوابة تواصل
+          </div>
+
         </div>
+
       </div>
+
+
+      <!-- نظام الكلان -->
+
       <div class="panel">
-        <h3>نظامنا</h3>
-        <p class="muted">جميع الأدوار داخل الكلان منسقة، والتواصل واضح، وما يهمنا هو التوازن بين الأداء والروح الجماعية.</p>
+
+        <h3>
+          نظامنا
+        </h3>
+
+
+        <p class="muted">
+
+          جميع الأدوار داخل الكلان منسقة، والتواصل واضح، وما يهمنا هو التوازن بين الأداء والروح الجماعية.
+
+        </p>
+
       </div>
+
+
+      <!-- الهدف -->
+
       <div class="panel">
-        <h3>الهدف</h3>
-        <p class="muted">رفع مستوى الكلان إلى تجربة احترافية وجذابة مع فريق متفاعل وقيادة منسقة.</p>
+
+        <h3>
+          الهدف
+        </h3>
+
+
+        <p class="muted">
+
+          رفع مستوى الكلان إلى تجربة احترافية وجذابة مع فريق متفاعل وقيادة منسقة.
+
+        </p>
+
       </div>
+
     </section>
 
-    <section class="grid-3" style="margin-top: 18px;">
+
+    <!-- =========================
+         الإحصائيات
+    ========================== -->
+
+    <section
+      class="grid-3"
+      style="margin-top: 18px;"
+    >
+
+
       <div class="stat-box">
-        <strong data-i18n="focus_title">التركيز</strong>
-        <span class="muted" data-i18n="focus_text">تنسيق ممتاز داخل الفرق</span>
+
+        <strong data-i18n="focus_title">
+          التركيز
+        </strong>
+
+        <span
+          class="muted"
+          data-i18n="focus_text"
+        >
+          تنسيق ممتاز داخل الفرق
+        </span>
+
       </div>
+
+
       <div class="stat-box">
-        <strong data-i18n="identity_title">العلامة</strong>
-        <span class="muted" data-i18n="identity_text">روح تفاعل ومشاركة قوية</span>
+
+        <strong data-i18n="identity_title">
+          العلامة
+        </strong>
+
+        <span
+          class="muted"
+          data-i18n="identity_text"
+        >
+          روح تفاعل ومشاركة قوية
+        </span>
+
       </div>
+
+
       <div class="stat-box">
-        <strong data-i18n="goal_title">الهدف</strong>
-        <span class="muted" data-i18n="goal_text">رفع مستوى الكلان ببطولة وتنظيم</span>
+
+        <strong data-i18n="goal_title">
+          الهدف
+        </strong>
+
+        <span
+          class="muted"
+          data-i18n="goal_text"
+        >
+          رفع مستوى الكلان ببطولة وتنظيم
+        </span>
+
       </div>
+
     </section>
 
-    <section class="panel" style="margin-top: 18px;">
-      <h2 data-i18n="social_title">حسابات الكلان الرسمية</h2>
+
+    <!-- =========================
+         حسابات الكلان
+    ========================== -->
+
+    <section
+      class="panel"
+      style="margin-top: 18px;"
+    >
+
+      <h2 data-i18n="social_title">
+        حسابات الكلان الرسمية
+      </h2>
+
+
       <div class="social-grid">
+
+
         <div class="social-item">
-          <strong>Instagram</strong><br>
-          <a href="#">@joff_clan</a>
+
+          <strong>
+            Instagram
+          </strong>
+
+          <br>
+
+          <a href="#">
+            @joff_clan
+          </a>
+
         </div>
+
+
         <div class="social-item">
-          <strong>TikTok</strong><br>
-          <a href="#">@joff_tiktok</a>
+
+          <strong>
+            TikTok
+          </strong>
+
+          <br>
+
+          <a href="#">
+            @joff_tiktok
+          </a>
+
         </div>
+
+
       </div>
+
     </section>
+
   </main>
 
+
+  <!-- ملف الجافاسكربت -->
+
   <script src="script.js"></script>
+
 </body>
 </html>

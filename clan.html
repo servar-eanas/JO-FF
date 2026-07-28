@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JO FF Clan | عن الكلان</title>
@@ -13,14 +14,44 @@
         <div class="brand-badge">🛡️</div>
         <span>JO FF Clan</span>
       </div>
-      <nav class="nav-links">
-        <a href="intro.html" data-i18n="nav_intro">المقدمة</a>
-        <a class="active" href="clan.html" data-i18n="nav_clan">عن الكلان</a>
-        <a href="competitions.html" data-i18n="nav_competitions">المسابقات</a>
-        <a href="contact.html" data-i18n="nav_contact">التواصل</a>
-        <a href="accounts.html" data-i18n="nav_market">الحسابات</a>
-        <a href="links.html" data-i18n="nav_links">الروابط</a>
-      </nav>
+<nav class="nav-links">
+
+  <a href="intro.html" data-i18n="nav_intro">
+    <span class="nav-icon">🏠</span>
+    <span>المقدمة</span>
+  </a>
+
+  <a href="clan.html" data-i18n="nav_clan">
+    <span class="nav-icon">👥</span>
+    <span>عن الكلان</span>
+  </a>
+
+  <a href="competitions.html" data-i18n="nav_competitions">
+    <span class="nav-icon">🏆</span>
+    <span>المسابقات</span>
+  </a>
+
+  <a href="contact.html" data-i18n="nav_contact">
+    <span class="nav-icon">💬</span>
+    <span>التواصل</span>
+  </a>
+
+  <a href="accounts.html" data-i18n="nav_market">
+    <span class="nav-icon">📦</span>
+    <span>الحسابات</span>
+  </a>
+
+  <a href="player.html">
+  <span class="nav-icon">🎮</span>
+  <span>اللاعبين</span>
+</a>
+
+  <a href="links.html" data-i18n="nav_links">
+    <span class="nav-icon">🔗</span>
+    <span>الروابط</span>
+  </a>
+
+</nav>
       <div class="control-group">
         <button id="themeToggle" class="btn secondary small" type="button">الوضع الليلي</button>
         <button id="langToggle" class="btn secondary small" type="button">EN</button>
@@ -71,8 +102,329 @@
         <div class="list-item">بنيابة الزعيم 3: يدعم المراقبة والإنجازات</div>
       </div>
     </section>
-  </main>
+  </main><section class="panel">
+
+  <div class="section-head">
+
+    <h2>
+      👥 أعضاء JO FF Clan
+    </h2>
+
+    <span class="badge">
+      أعضاء الكلان
+    </span>
+
+  </div>
+
+
+  <div
+    id="membersGrid"
+    class="grid-3"
+  ></div>
+
+</section>
+
+
+
+<section class="panel">
+
+  <h2>👥 أعضاء JO FF Clan</h2>
+
+  <p class="muted">
+    تعرف على أعضاء الكلان وفريقنا.
+  </p>
+
+  <div
+    id="membersList"
+    class="grid-3"
+  ></div>
+
+</section>
+
+
+<script>
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function () {
+
+    const container =
+      document.getElementById(
+        "membersGrid"
+      );
+
+
+    if (!container) {
+      return;
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/members"
+        );
+
+
+      const members =
+        await response.json();
+
+
+      container.innerHTML =
+        "";
+
+
+      if (
+        members.length === 0
+      ) {
+
+        container.innerHTML = `
+          <p class="muted">
+            لا يوجد أعضاء مضافون حاليا.
+          </p>
+        `;
+
+        return;
+
+      }
+
+
+      members.forEach(
+        function (
+          member
+        ) {
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "panel member-card";
+
+
+          const imageHTML =
+            member.image
+
+              ? `
+                <img
+                  src="${member.image}"
+                  class="game-image"
+                  alt="صورة ${escapeHTML(member.name)}"
+                >
+              `
+
+              : `
+                <div
+                  style="
+                    height:240px;
+                    display:grid;
+                    place-items:center;
+                    border-radius:18px;
+                    background:rgba(123,223,242,0.08);
+                    font-size:4rem;
+                  "
+                >
+                  👤
+                </div>
+              `;
+
+
+          card.innerHTML = `
+
+            ${imageHTML}
+
+            <h3>
+              👤 ${escapeHTML(member.name)}
+            </h3>
+
+            <span class="badge">
+              🏅 ${escapeHTML(member.rank)}
+            </span>
+
+            <p>
+              ⭐ المستوى:
+              ${escapeHTML(
+                member.level ||
+                "غير محدد"
+              )}
+            </p>
+
+            <p class="muted">
+              ${escapeHTML(
+                member.description ||
+                "عضو في JO FF Clan"
+              )}
+            </p>
+
+          `;
+
+
+          container.appendChild(
+            card
+          );
+
+        }
+      );
+
+
+    } catch (error) {
+
+      container.innerHTML = `
+        <p class="muted">
+          تعذر تحميل أعضاء الكلان.
+        </p>
+      `;
+
+      console.error(
+        error
+      );
+
+    }
+
+  }
+);
+
+</script>
+</body>
 
   <script src="script.js"></script>
-</body>
+  <script type="module">
+
+import {
+  db,
+  collection,
+  getDocs
+} from "./firebase-config.js";
+
+
+const membersList =
+  document.getElementById(
+    "membersList"
+  );
+
+
+async function loadMembers() {
+
+  membersList.innerHTML =
+    "<p>جاري تحميل الأعضاء...</p>";
+
+
+  try {
+
+    const snapshot =
+      await getDocs(
+        collection(db, "members")
+      );
+
+
+    membersList.innerHTML = "";
+
+
+    if (snapshot.empty) {
+
+      membersList.innerHTML =
+        "<p>لا يوجد أعضاء حاليا.</p>";
+
+      return;
+
+    }
+
+
+    snapshot.forEach(
+      function(memberDoc) {
+
+        const member =
+          memberDoc.data();
+
+
+        const card =
+          document.createElement("div");
+
+
+        card.className =
+          "panel";
+
+
+        card.innerHTML = `
+
+          ${
+            member.image
+              ? `
+                <img
+                  src="${member.image}"
+                  alt="صورة عضو الكلان"
+                  class="game-image"
+                >
+              `
+              : ""
+          }
+
+          <h3>
+            👤 ${escapeHTML(member.name)}
+          </h3>
+
+          <p>
+            🎮 اسم اللاعب:
+            ${escapeHTML(member.username)}
+          </p>
+
+          <p>
+            🏅 الرتبة:
+            ${escapeHTML(member.role)}
+          </p>
+
+          <p>
+            ⭐ المستوى:
+            ${escapeHTML(member.level)}
+          </p>
+
+          <span class="badge">
+            ${escapeHTML(member.status)}
+          </span>
+
+        `;
+
+
+        membersList.appendChild(card);
+
+      }
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(error);
+
+    membersList.innerHTML =
+      "<p>تعذر تحميل أعضاء الكلان.</p>";
+
+  }
+
+}
+
+
+function escapeHTML(value) {
+
+  return String(value)
+
+    .replace(/&/g, "&amp;")
+
+    .replace(/</g, "&lt;")
+
+    .replace(/>/g, "&gt;")
+
+    .replace(/"/g, "&quot;")
+
+    .replace(/'/g, "&#039;");
+
+}
+
+
+loadMembers();
+
+</script>
 </html>

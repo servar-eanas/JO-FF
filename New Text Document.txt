@@ -1,0 +1,58 @@
+JO-FF-CLAN/
+│
+├── server.js
+├── package.json
+├── clan.db
+│
+├── public/
+│   ├── intro.html
+│   ├── clan.html
+│   ├── competitions.html
+│   ├── contact.html
+│   ├── accounts.html
+│   ├── links.html
+│   ├── login.html
+│   ├── admin.html
+│   │
+│   ├── style.css
+│   └── script.js
+│
+└── uploads/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+JO FF CLAN
+│
+├── الموقع
+│   ├── المقدمة
+│   ├── عن الكلان
+│   ├── الأعضاء
+│   ├── المسابقات
+│   ├── التواصل
+│   ├── الحسابات
+│   └── الروابط
+│
+└── لوحة الإدارة 🔐
+    ├── إضافة عضو
+    ├── تعديل عضو
+    ├── حذف عضو
+    ├── إدارة المسابقات
+    ├── إدارة الحسابات
+    └── إدارة الرسائل
+              │
+              ▼
+          Firebase
+              │
+              ▼
+           قاعدة البيانات
