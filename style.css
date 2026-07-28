@@ -46,7 +46,24 @@ body.light-theme {
   --nav-button: rgba(230, 238, 250, 0.75);
   --nav-border: rgba(50, 100, 180, 0.25);
 }
+/* =========================================
+   حركة ايموجي أزرار التنقل
+========================================= */
 
+.nav-links a {
+  position: relative;
+}
+
+.nav-links a .nav-icon {
+  display: inline-block !important;
+  position: relative;
+  transition: all 0.4s ease !important;
+}
+
+/* عند تمرير الماوس على زر التنقل */
+.nav-links a:hover .nav-icon {
+  transform: translateX(-8px) rotate(-12deg) !important;
+}
 
 /* =========================================================
    الأساسيات
@@ -2644,3 +2661,5 @@ span {
   box-shadow: none !important;
   transform: none !important;
 }
+
+
